@@ -109,3 +109,84 @@ Running migrations:
 
 前面几行是 Django 应用的数据库迁移。通过应用迁移，初始应用进程的表在数据库中创建。您将在本章的创建和应用迁移部分了解迁移管理命令。
 
+### 运行开发服务器
+Django附带了一个轻量级的Web服务器来快速运行你的代码，而无需花时间配置生产服务器。当你运行Django开发服务器时，它会不断检查代码中的更改。它会自动重新加载，使您无需在代码更改后手动重新加载它。但是，它可能不会注意到某些操作，例如向项目添加新文档，因此在这些情况下，您必须手动重新启动服务器。
+
+通过键入项目根文档夹中的以下命令来启动开发服务器：
+```shell
+python manage.py runserver
+```
+
+现在在浏览器中打开 [http://127.0.0.1:8000/](http://127.0.0.1:8000/)。您应该会看到一个页面，说明项目已成功运行，如以下屏幕截图所示：
+![](https://upload.wikimedia.org/wikipedia/commons/5/53/Django_2.1_landing_page.png)
+前面的屏幕截图表明 Django 正在运行。如果您查看控制台，您将看到浏览器执行的 GET 请求：
+
+每个 HTTP 请求都由开发服务器记录在控制台中。运行开发服务器时发生的任何错误也将显示在控制台中。
+
+您可以在自定义主机和端口上运行 Django 开发服务器，也可以告诉 Django 加载特定的设置文档，如下所示：
+```shell
+python manage.py runserver 127.0.0.1:8001
+```
+> 当您必须处理需要不同配置的多个环境时，您可以为每个环境创建不同的设置文档。
+
+请记住，此服务器仅用于开发，不适合生产用途。为了在生产环境中部署Django，您应该使用Web服务器（例如Apache，Gunicorn或uWSGI）将其作为WSGI应用进程运行，或者使用Uvicorn或Daphne等服务器将其作为ASGI应用进程运行。您可以在 https://docs.djangoproject.com/en/3.0/howto/deployment/wsgi/ 上找到有关如何使用不同Web服务器部署Django的更多信息。
+
+第 14 章“上线”解释了如何为 Django 项目设置生产环境
+
+### 项目设置
+让我们打开 settings.py 文档，并查看项目的配置。 Django在此文档中包含了几个设置，但这些只是所有可用Django设置的一部分。您可以在 https://docs.djangoproject.com/en/3.0/ref/settings/ 查看所有设置及其默认值。
+
+以下设置值得一看：
+- DEBUG 是一个布尔值，用于打开和关闭项目的调试模式。如果设置为 True，当您的应用进程抛出未捕获的异常时，Django 将显示详细的错误页面。当您迁移到生产环境时，请记住您必须将其设置为 False。切勿在启用调试的情况下将站点部署到生产环境中，因为您将暴露与项目相关的敏感数据。
+
+- ALLOWED_HOSTS 在调试模式打开或运行测试时不应用。将站点移动到生产环境并将 DEBUG 设置为 False 后，您必须将域/主机添加到此设置中，以允许它为您的 Django 站点提供服务。
+
+- INSTALLED_APPS是您必须为所有项目编辑的设置。此设置告诉Django哪些应用进程在此站点上处于活动状态。默认情况下，Django包括以下应用进程：
+    + django.contrib.admin：一个管理站点
+    + django.contrib.auth： 默认认证系统
+    + django.contrib.contenttypes：处理内容类型的框架
+    + django.contrib.sessions：一个会话框架
+    + django.contrib.messages：一个消息传递框架
+    + django.contrib.staticfiles：管理静态文档的框架
+
+- MIDDLEWARE 是一个列表，其中包含要执行的中间件。
+
+- ROOT_URLCONF 表示定义应用进程的根 URL 模式的 Python 模块。
+- DATABASES 是一个字典，其中包含要在项目中使用的所有数据库的设置。必须始终存在默认数据库。默认配置使用 SQLite3 数据库。
+- LANGUAGE_CODE定义了此Django站点的默认语言代码。
+- USE_TZ 告诉 Django 激活/停用时区支持。 Django 支持时区感知日期时间。当您使用 startproject 管理命令创建新项目时，此设置设置为 True。
+
+如果您对在这里看到的内容不太了解，请不要担心。您将在接下来的章节中学习不同的 Django 设置。
+
+### 项目和应用
+在本书中，您将一遍又一遍地遇到术语项目和应用进程。在Django中，一个项目被认为是具有某些设置的Django安装。 应用进程是一组模型、视图、模板和 URL。应用进程与框架交互以提供一些特定的功能，并且可以在各种项目中重用。您可以将项目视为您的网站，其中包含多个应用进程，例如博客，wiki或论坛，这些应用进程也可以由其他项目使用。
+
+下图显示了一个 Django 项目的结构：
+
+![](https://djangobook.com/wp-content/uploads/2022/01/structure_drawing1.png)
+
+### 创建应用进程
+现在让我们创建你的第一个Django应用进程。您将从头开始创建一个博客应用进程。从项目的根目录中，运行以下命令：
+```shell
+python manage.py startapp blog
+```
+
+这将创建应用进程的基本结构，如下所示：
++ blog/
+    - __init__.py
+    - admin.py
+    - apps.py
+    - migrations/
+        - __init__.py
+    - models.py
+    - tests.py
+    - views.py
+
+这些文档如下所示：
+- admin.py：这是您注册模型以将它们包含在 Django 管理站点中的位置——使用此站点是可选的。
+- apps.py：这包括博客应用进程的主要配置。
+- migrations：此目录将包含您的应用进程的数据库迁移。迁移允许 Django 跟踪您的模型更改并相应地同步数据库。
+- models.py：这包括应用进程的数据模型;所有Django应用进程都需要有一个 models.py 文档，但这个文档可以留空。
+- tests.py：您可以在此处为应用进程添加测试。
+- views.py：你的应用进程的逻辑在这里；每个视图接收一个 HTTP 请求，对其进行处理，然后返回一个响应。
+
