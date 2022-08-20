@@ -6,3 +6,10 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# cache
+__pycache__
+
+
+# dababase
+db.sqlite3

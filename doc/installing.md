@@ -190,3 +190,139 @@ python manage.py startapp blog
 - tests.py：您可以在此处为应用进程添加测试。
 - views.py：你的应用进程的逻辑在这里；每个视图接收一个 HTTP 请求，对其进行处理，然后返回一个响应。
 
+
+## 设计博客数据架构
+您将通过为您的博客定义数据模型来开始设计您的博客数据模式。模型是一个 Python 类，它是 django.db.models.Model 的子类，其中每个属性代表一个数据库字段。 Django 将为 models.py 文档中定义的每个模型创建一个表。当你创建一个模型时，Django 会为你提供一个实用的 API 来方便地查询数据库中的对象。
+
+首先，您需要定义一个 Post models。将以下行添加到博客应用进程的 models.py 文档中：
+```python
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
+
+# Create your models here.
+
+class Post(models.Model):
+    '''
+    @Description	:Blog Post DataModels
+    ----------
+    @Param			:None
+    ----------
+    @Returns		:None
+    '''
+    STATUS_CHOICES = (
+        ('draft', 'DRAFT'),
+        ('published', 'PUBLISHED')
+    )
+    
+    title = models.CharField(max_length=250)
+    slug = models.SlugField(max_length=250, unique_for_date='publish')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
+    body = models.TextField()
+    publish = models.DateTimeField(default=timezone.now)
+    created = models.DateTimeField(auto_now_add=True)
+    updated =models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='draft')
+
+    class Meat():
+        '''
+        @Description	:None
+        ----------
+        @Param			:None
+        ----------
+        @Returns		:None
+        '''
+        ordering = ('-publish')
+
+    def __str__(self):
+        '''默认返回 title'''
+        return self.title
+```
+这是您的博客文章数据模型。让我们看一下您刚刚为该模型定义的字段：
+- title：这是帖子标题的字段。该字段是 CharField，它转换为 SQL 数据库中的一个 VARCHAR 列。
+
+- slug：这是一个用于 URL 的字段。 slug 是一个短标签，只包含字母、数字、下划线或连字符。您将使用 slug 字段为您的博客文章构建漂亮的、对 SEO 友好的 URL。您已将 unique_for_date 参数添加到此字段，以便您可以使用发布日期和 slug 为帖子构建 URL。 Django 将防止多个帖子在给定日期出现相同的 slug。
+
+- author：此字段定义了多对一关系，这意味着每个帖子都由用户编写，用户可以编写任意数量的帖子。对于此字段，Django 将使用相关模型的主键在数据库中创建一个外键。在这种情况下，您依赖于Django身份验证系统的用户模型。on_delete 参数指定删除被引用对象时要采用的行为。这不是Django所特有的;它是一个SQL标准。使用 CASCADE，您可以指定在删除引用的用户时，数据库还将删除所有相关的博客文章。您可以在 https://docs.djangoproject.com/en/3.0/ref/models/fields/#django.db.models 查看所有可能的选项。 ForeignKey.on_delete。使用related_name属性指定反向关系的名称（从“用户”到“发布”）。这将允许您轻松访问相关对象。稍后您将了解有关此内容的更多信息。
+
+- body：这是帖子的正文。此字段是一个文本字段，可转换为 SQL 数据库中的 TEXT 列。
+
+- publish：此日期时间指示发布帖子的时间。您使用 Django 的 timezone now 方法作为默认值。这会以时区感知格式返回当前日期时间。您可以将其视为标准 Python datetime.now 方法的时区感知版本。
+
+- created：此日期时间指示帖子的创建时间。由于您在此处使用auto_now_add，因此在创建对象时将自动保存日期。
+
+- updated：此日期时间表示上次更新帖子的时间。由于您在此处使用 auto_now，因此在保存对象时会自动更新日期。
+
+- status：此字段显示帖子的状态。您使用一个选项参数，因此该字段的值只能设置为给定选项之一。
+
+Django 带有不同类型的字段，可用于定义模型。您可以在 https://docs.djangoproject.com/en/4.0/ref/models/fields/ 找到所有字段类型。
+
+模型中的 Meta 类包含元数据。当您查询数据库时，您告诉 Django 默认按发布字段以降序对结果进行排序。 使用负前缀指定降序。这样，最近发布的帖子将首先显示。
+
+__str__() 方法是对象的默认人类可读表示。 Django 会在很多地方使用它，比如管理站点。
+
+### 激活应用进程
+为了让 Django 跟踪您的应用进程并能够为其模型创建数据库表，您必须激活它。为此，请编辑 settings.py 文档并将 blog.apps.BlogConfig 添加到 INSTALLED_APPS 设置中。它应该如下所示：
+```python
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'blog.apps.BlogConfig'
+]
+```
+
+BlogConfig 类是应用进程配置。现在Django知道你的应用进程在这个项目中是活跃的，并且能够加载它的模型。
+
+### 创建和应用迁移
+既然您已经为博客文章创建了数据模型，那幺您将需要一个数据库表。 Django 带有一个迁移系统，可以跟踪对模型所做的更改，并使它们能够传播到数据库中。如前所述，migrate 命令为 INSTALLED_APPS 中列出的所有应用进程应用迁移；它将数据库与当前模型和现有迁移同步。
+
+首先，您需要为 Post 模型创建初始迁移。在项目的根目录中，运行以下命令：
+```shell
+python manage.py makemigrations blog
+```
+
+Django刚刚在博客应用进程的迁移目录中创建了0001_initial.py文档。您可以打开该文档以查看迁移的显示方式。 迁移指定对其他迁移的依赖关系，以及在数据库中执行的操作，以将其与模型更改同步。
+
+让我们看一下 Django 将在数据库中执行的 SQL 代码来为您的模型创建表。 sqlmigrate 命令获取迁移名称并返回它们的 SQL 而不执行它。运行以下命令来检查第一次迁移的 SQL 输出：
+```shell
+ python manage.py sqlmigrate blog 0001
+```
+ 
+输出应如下所示：
+```shell
+BEGIN;
+--
+-- Create model Post
+--
+CREATE TABLE "blog_post" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "title" varchar(250) NOT NULL, "slug" varchar(250) NOT NULL, "body" text NOT NULL, "publish" datetime NOT NULL, "created" datetime NOT NULL, "updated" datetime NOT NULL, "status" varchar(50) NOT NULL, "author_id" integer NOT NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED);
+CREATE INDEX "blog_post_slug_b95473f2" ON "blog_post" ("slug");
+CREATE INDEX "blog_post_author_id_dd7a8485" ON "blog_post" ("author_id");
+COMMIT;
+```
+确切的输出取决于您使用的数据库。前面的输出是为 SQLite 生成的。正如您在输出中看到的，Django 通过组合应用进程名称和模型的小写名称 (blog_post) 来生成表名称，但您也可以在模型的 Meta 类中使用db_table 属性。
+
+Django 会自动为每个模型创建一个主键，但您也可以通过在您的模型字段之一中指定 primary_key=True 来覆盖它。默认主键是一个 id 列，它由一个自动递增的整数组成。此列对应于自动添加到模型中的 id 字段。
+
+让我们将数据库与新模型同步。运行以下命令以应用现有迁移：
+```shell
+python manage.py migrate
+```
+您刚刚为INSTALLED_APPS中列出的应用进程（包括您的博客应用进程）应用了迁移。应用迁移后，数据库将反映模型的当前状态。
+
+如果您编辑 models.py 文档以添加、删除或更改现有模型的字段，或者如果您添加新模型，则必须使用 makemigrations 命令创建新迁移。迁移将允许 Django 跟踪模型更改。然后，您必须使用 migrate 命令应用它，以使数据库与您的模型保持同步。
+
+### 为模型创建管理站点
+
+
+
+
+
+
+
+
+
+
