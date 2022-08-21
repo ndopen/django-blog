@@ -1,5 +1,6 @@
+# 构建博客应用程序
 
-## 安装 Django 
+## 1. 安装 Django 
 
 如果您已经安装了 Django，则可以跳过此部分并直接跳转到创建第一个项目部分。Django作为Python包出现，因此可以安装在任何Python环境中。如果您尚未安装Django，以下是安装它以进行本地开发的快速指南。
 
@@ -19,7 +20,7 @@ Python 3.10.5
 由于您将使用Python 3，因此您不必安装数据库。这个Python版本带有一个内置的SQLite数据库。SQLite是一个轻量级数据库，你可以与Django一起开发。如果计划在生产环境中部署应用进程，则应使用功能齐全的数据库，如 PostgreSQL、MySQL 或 Oracle。你可以在 https://docs.djangoproject.com/ en/3.0/topics/install/#database-install找到更多关于如何使用 Django 运行数据库的信息。
 
 
-### 创建一个隔离的 Python 环境
+### 1.1 创建一个隔离的 Python 环境
 从 3.3 版开始，Python 附带了 venv 库，它为创建轻量级虚拟环境提供了支持。每个虚拟环境都有自己的 Python 二进制文档，并且可以在其站点目录中拥有自己独立的一组已安装 Python 包。使用 Python venv 模块创建隔离的 Python 环境允许您为不同的项目使用不同的包版本，这比在系统范围内安装 Python 包实用得多。使用 venv 的另一个优点是您不需要任何管理权限来安装 Python 包
 
 使用以下命令创建隔离环境：
@@ -41,7 +42,7 @@ shell 提示符将包含括在括号中的活动虚拟环境的名称，如下�
 
 您可以随时使用停用命令停用环境。 您可以在 https://docs.python.org/3/ library/venv.html 找到有关venv的更多信息。
 
-### 用 pip 安装 Django
+### 1.2 用 pip 安装 Django
 pip包管理系统是安装Django的首选方法。Python 3.8 预装了 pip，但你可以在 https://pip.pypa.io/en/stable/installing/ 找到 pip 安装说明。
 
 在[pypi](https://pypi.org/project/Django/)中查询最新的django版本 
@@ -61,7 +62,7 @@ Django将安装在虚拟环境的Python site-packages/目录中。
 ```
 如果您得到类似 3.0.X 的输出，则 Django 已成功安装在您的机器上。
 
-## 创建你的第一个项目
+## 2. 创建你的第一个项目
 我们的第一个Django项目将构建一个完整的博客。Django提供了一个命令，允许您创建一个初始项目文档结构。从 shell 运行以下命令
 ```shell
 django-admin startproject mysite .
@@ -109,7 +110,7 @@ Running migrations:
 
 前面几行是 Django 应用的数据库迁移。通过应用迁移，初始应用进程的表在数据库中创建。您将在本章的创建和应用迁移部分了解迁移管理命令。
 
-### 运行开发服务器
+### 2.1 运行开发服务器
 Django附带了一个轻量级的Web服务器来快速运行你的代码，而无需花时间配置生产服务器。当你运行Django开发服务器时，它会不断检查代码中的更改。它会自动重新加载，使您无需在代码更改后手动重新加载它。但是，它可能不会注意到某些操作，例如向项目添加新文档，因此在这些情况下，您必须手动重新启动服务器。
 
 通过键入项目根文档夹中的以下命令来启动开发服务器：
@@ -133,7 +134,7 @@ python manage.py runserver 127.0.0.1:8001
 
 第 14 章“上线”解释了如何为 Django 项目设置生产环境
 
-### 项目设置
+### 2.2 项目设置
 让我们打开 settings.py 文档，并查看项目的配置。 Django在此文档中包含了几个设置，但这些只是所有可用Django设置的一部分。您可以在 https://docs.djangoproject.com/en/3.0/ref/settings/ 查看所有设置及其默认值。
 
 以下设置值得一看：
@@ -158,14 +159,14 @@ python manage.py runserver 127.0.0.1:8001
 
 如果您对在这里看到的内容不太了解，请不要担心。您将在接下来的章节中学习不同的 Django 设置。
 
-### 项目和应用
+### 2.3 项目和应用
 在本书中，您将一遍又一遍地遇到术语项目和应用进程。在Django中，一个项目被认为是具有某些设置的Django安装。 应用进程是一组模型、视图、模板和 URL。应用进程与框架交互以提供一些特定的功能，并且可以在各种项目中重用。您可以将项目视为您的网站，其中包含多个应用进程，例如博客，wiki或论坛，这些应用进程也可以由其他项目使用。
 
 下图显示了一个 Django 项目的结构：
 
 ![](https://djangobook.com/wp-content/uploads/2022/01/structure_drawing1.png)
 
-### 创建应用进程
+### 2.4 创建应用进程
 现在让我们创建你的第一个Django应用进程。您将从头开始创建一个博客应用进程。从项目的根目录中，运行以下命令：
 ```shell
 python manage.py startapp blog
@@ -191,7 +192,7 @@ python manage.py startapp blog
 - views.py：你的应用进程的逻辑在这里；每个视图接收一个 HTTP 请求，对其进行处理，然后返回一个响应。
 
 
-## 设计博客数据架构
+## 3. 设计博客数据架构
 您将通过为您的博客定义数据模型来开始设计您的博客数据模式。模型是一个 Python 类，它是 django.db.models.Model 的子类，其中每个属性代表一个数据库字段。 Django 将为 models.py 文档中定义的每个模型创建一个表。当你创建一个模型时，Django 会为你提供一个实用的 API 来方便地查询数据库中的对象。
 
 首先，您需要定义一个 Post models。将以下行添加到博客应用进程的 models.py 文档中：
@@ -261,7 +262,7 @@ Django 带有不同类型的字段，可用于定义模型。您可以在 https:
 
 __str__() 方法是对象的默认人类可读表示。 Django 会在很多地方使用它，比如管理站点。
 
-### 激活应用进程
+### 3.1 激活应用进程
 为了让 Django 跟踪您的应用进程并能够为其模型创建数据库表，您必须激活它。为此，请编辑 settings.py 文档并将 blog.apps.BlogConfig 添加到 INSTALLED_APPS 设置中。它应该如下所示：
 ```python
 INSTALLED_APPS = [
@@ -277,7 +278,7 @@ INSTALLED_APPS = [
 
 BlogConfig 类是应用进程配置。现在Django知道你的应用进程在这个项目中是活跃的，并且能够加载它的模型。
 
-### 创建和应用迁移
+### 3.2 创建和应用迁移
 既然您已经为博客文章创建了数据模型，那幺您将需要一个数据库表。 Django 带有一个迁移系统，可以跟踪对模型所做的更改，并使它们能够传播到数据库中。如前所述，migrate 命令为 INSTALLED_APPS 中列出的所有应用进程应用迁移；它将数据库与当前模型和现有迁移同步。
 
 首先，您需要为 Post 模型创建初始迁移。在项目的根目录中，运行以下命令：
@@ -315,8 +316,263 @@ python manage.py migrate
 
 如果您编辑 models.py 文档以添加、删除或更改现有模型的字段，或者如果您添加新模型，则必须使用 makemigrations 命令创建新迁移。迁移将允许 Django 跟踪模型更改。然后，您必须使用 migrate 命令应用它，以使数据库与您的模型保持同步。
 
-### 为模型创建管理站点
+## 4. 为模型创建管理站点
+现在您已经定义了帖子模型，您将创建一个简单的管理站点来管理您的博客帖子。 Django 带有一个内置的管理界面，对于编辑内容非常有用。 Django 站点是通过读取模型元数据并提供可用于编辑内容的生产就绪界面来动态构建的。您可以开箱即用地使用它，配置您希望模型在其中显示的方式。
 
+django.contrib.admin 应用进程已包含在 INSTALLED_APPS 设置中，因此您无需添加它。
+
+### 4.1 创建超级用户
+首先，您需要创建一个用户来管理管理网站。运行以下命令：
+```shell
+python manage.py createsuperuser
+```
+
+您将看到以下输出;输入所需的用户名、电子邮件和密码，如下所示：
+```shell
+Username (leave blank to use 'hairong'): admin
+Email address: admin@admin.com
+Password:
+Password (again):
+This password is too short. It must contain at least 8 characters.
+This password is too common.
+This password is entirely numeric.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+```
+
+### 4.2 Django 管理站点
+
+现在使用 python manage.py runserver 命令启动开发服务器，并在浏览器中打开 http://127.0.0.1:8000/admin/。您应该会看到管理登录页面，如以下屏幕截图所示：
+![](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Admin_site/admin_home.png)
+
+使用您在上一步中创建的用户的凭据登录。您将看到管理网站索引页，如以下屏幕截图所示：
+
+您可以在前面的屏幕截图中看到的组和用户模型是位于 django.contrib.auth 中的 Django 身份验证框架的一部分。如果单击“用户”，您将看到之前创建的用户。
+
+### 4.5将模型添加到管理站点
+让我们将博客模型添加到管理站点。编辑博客应用进程的 admin.py 文档，使其如下所示：
+```python
+from django.contrib import admin
+from blog.models import Post
+# Register your models here.
+admin.site.register(Post)
+```
+现在，在浏览器中重新加载管理网站。您应该会在网站上看到您的帖子模型，如下所示：
+![](https://cloud.sihairong.net/s/gK4P593PoQtDL8g/preview)
+
+这很容易，对吧？当您在Django管理站点中注册模型时，您将获得一个用户友好的界面，该界面通过内省模型生成，允许您以简单的方式列出，编辑，创建和删除对象。
+
+单击帖子旁边的添加链接以添加新帖子。您将注意到 Django 为您的模型动态生成的表单，如以下屏幕截图所示：
+![](https://cloud.sihairong.net/s/mYZGAYB4H6W7Wir/preview)
+
+Django 为每种类型的字段使用不同的表单小部件。即使是复杂的字段，例如 DateTimeField，也可以通过简单的界面（例如 JavaScript 日期选择器）显示。
+
+填写表格，然后单击“保存”按钮。您应该被重定向到帖子列表页面，其中包含成功消息和您刚刚创建的帖子，如以下屏幕截图所示：
+![](https://cloud.sihairong.net/s/jxcHMMLT4xYZ6gj/preview)
+
+### 4.6 自定义模型的显示方式
+现在，我们将看看如何自定义管理站点。编辑您的博客应用进程的 admin.py 文档并进行更改，如下所示：
+```python
+@admin.register(Post)
+
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'slug', 'author', 'publish', 'status')
+```
+
+您正在告诉 Django 管理站点，您的模型是使用从 ModelAdmin 继承的自定义类在站点中注册的。在此类中，可以包含有关如何在站点中显示模型以及如何与模型交互的信息。
+
+list_display 属性允许您设置要在管理对象列表页面上显示的模型字段。 @admin.register() 装饰器执行与您替换的 admin.site.register() 函数相同的功能，注册它装饰的 ModelAdmin 类。
+
+让我们使用以下代码为管理模型添加更多选项：
+```python
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'slug', 'author', 'publish', 'status')
+    list_filter = ('status', 'publish', 'author')
+    search_fields = ('title', 'body')
+    raw_id_fields = ('author',)
+    date_hierarchy = 'publish'
+    ordering = ('publish', 'status')
+    prepopulated_fields = {'slug' : ('title',)}
+```
+
+返回浏览器并重新加载帖子列表页面。现在，它看起来像这样：
+![](https://cloud.sihairong.net/s/7Nbe7DGWonAJWbj/preview)
+
+您可以看到帖子列表页面上显示的字段是您在 list_display 属性中指定的字段。列表页面现在包含一个右侧栏，允许您按 list_filter 属性中包含的字段过滤结果。
+
+页面上出现了一个搜索栏。这是因为您已使用 search_fields 属性定义了可搜索字段的列表。在搜索栏的正下方，有导航链接可以在日期层次结构中导航;这已由 date_hierarchy 属性定义。您还可以看到，默认情况下，帖子按“状态”和“发布”列排序。您已使用排序属性指定了默认排序条件。
+
+接下来，单击“添加 POST”链接。您还将在此处注意到一些更改。当您键入新帖子的标题时，系统会自动填充辅助信息域。您已经告诉 Django 使用 prepopulated_fields 属性使用 title 字段的输入来预填充 slug 字段。
+
+此外，作者字段现在显示有一个查找小部件，当您拥有数千名用户时，该小部件可以比下拉选择输入更好地扩展。这是通过 raw_id_fields 属性实现的;
+
+只需几行代码，即可自定义模型在管理站点上的显示方式。有很多方法可以自定义和扩展Django管理站点;您将在本书的后面部分了解更多有关此内容的信息。
+
+## 5. 使用查询集和管理器
+现在，您已经拥有了一个功能齐全的管理网站来管理博客的内容，现在是时候学习如何从数据库中检索信息并与之交互了。Django附带了一个强大的数据库抽象API，可让您轻松创建，检索，更新和删除对象。Django对象关系映射器（ORM）与MySQL，PostgreSQL，SQLite，Oracle和MariaDB兼容。 请记住，您可以在项目 settings.py 文档的“数据库”设置中定义项目的数据库。Django可以一次处理多个数据库，你可以对数据库路由器进行编程以创建自定义路由方案。
+
+一旦你创建了数据模型，Django 会为你提供一个免费的 API 来与它们交互。您可以在 https://docs.djangoproject.com/en/4.0/ref/models/ 找到官方文档的数据模型参考。
+
+Django ORM 基于查询集。 QuerySet 是用于从数据库中检索对象的数据库查询集合。您可以将过滤器应用于 QuerySet，以根据给定参数缩小查询结果的范围。
+
+### 5.1 创建对象
+打开终端并运行以下命令以打开 Python shell：
+```shell
+python manage.py shell
+```
+
+Then, type the following lines:
+```shell
+>>> from blog.models import *
+>>> from django.contrib.auth.models import User
+>>> user = User.objects.get(username = 'admin')
+>>> post = Post(title = 'shell save blog', body='post body', slug='shellblog', author=user)
+>>> post.save()
+```
+
+让我们分析一下这段代码的作用。首先，您使用用户名 admin 检索用户对象：
+```shell
+ User.objects.get(username = 'admin')
+```
+get（） 方法允许您从数据库中检索单个对象。请注意，此方法需要与查询匹配的结果。如果数据库未返回任何结果，则此方法将引发“不存在”异常，如果数据库返回多个结果，则会引发“多对象返回”异常。这两个异常都是对其执行查询的模型类的属性。
+
+然后，您创建一个带有title、slug 和 body 的 Post 实例，并将您之前检索到的用户设置为Post的author：
+```python
+Post(title = 'shell save blog', body='post body', slug='shellblog', author=user)
+```
+
+最后，使用 save() 方法将 Post 对象保存到数据库：
+```python
+post.save()
+```
+
+前面的操作在后台执行 INSERT SQL 语句。您已经了解了如何先在内存中创建对象，然后将其持久化到数据库中，但您也可以使用 create() 方法通过单个操作创建对象并将其持久化到数据库中，如下所示：
+```python
+Post.objects.create(title='create function', slug = 'function', body='used django Api createFunction', author=user)
+```
+
+### 5.2 更新对象
+现在，将帖子的标题更改为其他名称，然后再次保存对象：
+```shell
+>>> post.title = 'New Title'
+>>> post.save()
+```
+这一次，save（） 方法执行 UPDATE SQL 语句。
+
+### 5.3 检索对象
+您已经知道如何使用 get（） 方法从数据库中检索单个对象。您使用 Post.objects.get（） 访问了此方法。每个 Django 模型至少有一个管理器，默认管理器称为对象。您可以使用模型管理器获取查询集对象。要从表中检索所有对象，只需在默认对象管理器上使用 all（） 方法，如下所示：
+```shell
+>>> postsAll = Post.objects.all()
+```
+这就是创建返回数据库中所有对象的 QuerySet 的方式。请注意，此 QuerySet 尚未执行。 Django QuerySets 是惰性的，这意味着它们仅在被迫时才被评估。这种行为使 QuerySets 非常高效。如果不将 QuerySet 设置为变量，而是直接在 Python shell 上编写，则会执行 QuerySet 的 SQL 语句，因为你强制它输出结果：
+```shell
+>>> postsAll  
+<QuerySet [<Post: Field options>, <Post: blank>, <Post: choices>, <Post: New Title>, <Post: create function>]>
+```
+
+#### 5.3.1 使用 filter（） 方法
+若要筛选查询集，可以使用管理器的 filter（） 方法。例如，您可以使用以下查询集检索 2020 年发布的所有帖子：
+```python
+Post.objects.filter(publish__year=2022)
+```
+
+您还可以按多个字段进行过滤。例如，您可以使用用户名 admin 检索作者在 2020 年发布的所有帖子：
+```python
+Post.objects.filter(publish__year=2022, author__username="hairong")
+```
+
+这等同于构建链接多个过滤器的相同 QuerySet：
+```python
+Post.objects.filter(publish__year=2022).filter(author__username="admin")
+```
+
+> 具有字段查找方法的查询使用两个下划线构建，例如，publish__year，但相同的符号也用于访问相关模型的字段，例如 author__username。
+
+#### 5.3.2 使用 exclude（）
+您可以使用管理器的 exclude（） 方法从查询集中排除某些结果。例如，您可以检索 2020 年发布的所有帖子，其标题不以“New”开头：
+```python
+Post.objects.filter(publish__year=2022).exclude(title__startswith='new')
+```
+
+#### 5.3.3 使用 order_by（）
+您可以使用管理器的 order_by（） 方法按不同字段对结果进行排序。例如，您可以检索按标题排序的所有对象，如下所示：
+```python
+Post.objects.order_by('title')
+```
+
+隐含升序。您可以使用负号前缀指示降序，如下所示：
+```python
+Post.objects.order_by('-publish')
+```
+
+### 5.4 删除对象
+如果要删除对象，可以使用 delete() 方法从对象实例中执行：
+```python
+posts = Post.objects.get(id=2)
+posts.delete()
+```
+> 请注意，删除对象还将删除定义为 on_delete 设置为 CASCADE 的 ForeignKey 对象的任何依赖关系。
+
+
+### 5.5 当查询集被评估时
+在评估之前，创​​建 QuerySet 不涉及任何数据库活动。 QuerySet 通常返回另一个未计算的 QuerySet。您可以将任意数量的过滤器连接到 QuerySet，并且在评估 QuerySet 之前不会访问数据库。在评估 QuerySet 时，它会转换为对数据库的 SQL 查询。
+
+QuerySet 仅在以下情况下进行评估：
+- 第一次迭代它们时
+- 当你对它们进行切片时，例如Post.objects.all（）[：3]
+- 当您腌制或缓存它们时
+- 当您在它们上调用 repr（） 或 len（） 时
+- 当您在它们上显式调用 list() 时
+- 当您在语句中测试它们时，例如 bool（），或，and，或 if
+
+### 5.6 创建模型管理器
+正如我之前提到的，`objects` 是检索数据库中所有对象的每个模型的默认管理器。但是，您也可以为模型定义自定义管理器。您将创建一个自定义管理器来检索具有已发布状态的所有帖子。
+
+有两种方法可以为模型添加或自定义管理器：可以向现有管理器添加额外的管理器方法，或者通过修改管理器返回的初始 QuerySet 来创建新管理器。第一种方法为您提供 QuerySet API，如 Post.objects.my_manager（），后者为您提供 Post.my_manager.all（）。模型管理器将允许您使用Post.published.all（）检索帖子。
+
+编辑您的博客应用进程的 models.py 文档以添加自定义管理器：
+```python
+class PublisedManager(models.Manager):
+    '''定义published 模型管理方法，返回贴文状态为发布的对象'''
+    def get_queryset(self):
+        return super(PublisedManager, self).get_queryset().filter(status = 'published')
+
+class Post(models.Model):
+    objects = models.Manager()
+    published = PublisedManager()
+
+    ...
+```
+
+模型中声明的第一个管理器成为默认管理器。您可以使用 Meta 属性 default_manager_name 来指定不同的默认管理器。如果模型中没有定义管理器，Django 会自动为其创建对象默认管理器。如果您为模型声明了任何管理器，但还想保留对象管理器，则必须将其显式添加到模型中。在上述代码中，您将默认对象管理器和已发布的自定义管理器添加到 Post 模型。
+
+管理器的 `get_queryset（）` 方法返回将要执行的查询集。重写此方法以将自定义筛选器包含在最终的查询集中。
+
+您现在已经定义了自定义管理器并将其添加到 Post 模型中；您可以使用它来执行查询。让我们测试一下。
+
+使用以下命令再次启动开发服务器：
+```shell
+python manage.py shell
+```
+
+现在，您可以导入 Post 模型并检索标题以 Who 开头的所有已发布帖子，执行以下 QuerySet：
+```python
+from blog.models import Post
+Post.published.filter(title__startswith='Who')
+```
+
+若要获取此查询集的结果，请确保在标题以“谁”开头的 Post 对象中将已发布的字段设置为 True。
+
+## 6. 构建List和PostDetail视图
+现在，您已经了解了如何使用 ORM，接下来就可以构建博客应用的视图了。Django Views只是一个Python函数，它接收Web请求并返回Web响应。返回所需响应的所有逻辑都位于视图内部。
+
+
+
+### 6.1 创建List和detail视图
+
+### 6.2 为您的视图添加 URL
+
+### 6.3 模型的规范 URL
 
 
 

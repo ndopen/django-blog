@@ -4,6 +4,11 @@ from django.utils import timezone
 
 # Create your models here.
 
+class PublisedManager(models.Manager):
+    '''定义published 模型管理方法，返回贴文状态为发布的对象'''
+    def get_queryset(self):
+        return super(PublisedManager, self).get_queryset().filter(status = 'published')
+
 class Post(models.Model):
     '''
     @Description	:Blog Post DataModels
@@ -27,16 +32,12 @@ class Post(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='draft')
 
     class Meat():
-        '''
-        @Description	:None
-        ----------
-        @Param			:None
-        ----------
-        @Returns		:None
-        '''
         ordering = ('-publish')
 
     def __str__(self):
         '''默认返回 title'''
         return self.title
-    
+
+    objects = models.Manager()
+    published = PublisedManager()
+
