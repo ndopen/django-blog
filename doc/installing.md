@@ -566,13 +566,95 @@ Post.published.filter(title__startswith='Who')
 ## 6. 构建List和PostDetail视图
 现在，您已经了解了如何使用 ORM，接下来就可以构建博客应用的视图了。Django Views只是一个Python函数，它接收Web请求并返回Web响应。返回所需响应的所有逻辑都位于视图内部。
 
-
+首先，您将创建应用进程视图，然后为每个视图定义一个 URL 模式，最后，您将创建 HTML 模板来呈现视图生成的数据。每个视图都会渲染一个模板，将变量传递给它，并返回一个带有渲染输出的 HTTP 响应。
 
 ### 6.1 创建List和detail视图
+让我们首先创建一个视图来显示帖子列表。编辑您的博客应用进程的 views.py 文档，使其如下所示：
+```python
+from django.shortcuts import render
+from blog.models import Post
+
+def post_list(request):
+    '''post list 视图方法，返回已发布所有posts'''
+    posts = Post.published.all()
+    return render(request, 'blog/post/list.html', {'posts': posts})
+```
+
+您刚刚创建了您的第一个 Django 视图。 post_list 视图将`request`对象作为唯一参数。所有视图都需要此参数。在此视图中，您使用之前创建的`PostManager`检索具有已发布状态的所有帖子。
+
+最后，您使用 Django 提供的 render() 快捷方式来呈现具有给定模板的帖子列表。此函数采用请求对象、模板路径和上下文变量来呈现给定的模板。它返回一个带有渲染文本（通常是 HTML 代码）的 HttpResponse 对象。 render() 快捷方式将请求上下文考虑在内，因此模板上下文处理器设置的任何变量都可以由给定模板访问。模板上下文处理器只是将变量设置到上下文中的可调用对象。您将在第 3 章，扩展您的博客应用进程中学习如何使用它们。
+
+让我们创建第二个视图来显示单个帖子。将以下函数添加到 views.py 文档中：
+```python
+def post_detail(request, post, year, month, day):
+    '''post detail 视图，返回请求条件相符合的Post'''
+    posts = get_object_or_404(Post, slug = post, status='published', publish__year=year, publish__month=month, publish__day=day)
+
+    return render(request, 'blog/post/detail.html', {'posts' : posts})
+```
+
+这是帖子详细信息视图。此视图采用年、月、日和帖子参数来检索具有给定辅助信息区和日期的已发布帖子。请注意，在创建 Post 模型时，已将 unique_for_date 参数添加到辅助信息域。这可确保在给定日期内只有一个帖子具有辅助信息交换，因此，您可以使用日期和数据域来检索单个信息。在详细信息视图中，使用 get_object_or_404（） 快捷方式检索所需的帖子。此函数检索与给定参数匹配的对象，如果未找到任何对象，则检索 HTTP 404（未找到）异常。最后，使用 render（） 快捷方式通过模板呈现检索到的帖子。
 
 ### 6.2 为您的视图添加 URL
+URL 模式允许您将 URL 映射到视图。URL 模式由字符串、视图和允许您在项目范围内命名 URL 的名称（可选）组成。Django贯穿每个URL模式，并在与请求的URL匹配的第一个模式处停止。然后，Django 导入匹配的 URL 模式的视图并执行它，传递 HttpRequest 类的实例和关键字或位置参数。
 
-### 6.3 模型的规范 URL
+在博客应用进程的目录中创建一个 urls.py 文档，并在其中添加以下行：
+```python
+from django.urls import path
+from . import views
+app_name = 'blog'
+
+urlpatterns = [
+    # post urls
+    path('', views.post_list, name='post_list'),
+    path('<int:year>/<int:month>/<int:day>/<slug:post>/', views.post_detail, name='post_detail')    
+]
+```
+
+在上面的代码中，使用 app_name 变量定义应用进程命名空间。这允许您按应用进程组织 URL，并在引用它们时使用该名称。您可以使用 path（） 函数定义两种不同的模式。第一个 URL 模式不采用任何参数，并映射到post_list视图。 第二个模式采用以下四个参数，并映射到post_详细信息视图：
+- year：需要一个整数
+- month：需要一个整数 
+- day：需要一个整数 
+- post：可以由单词和连字符组成
+
+您使用尖括号从 URL 中捕获值。在 URL 模式中指定为 &amp;lt;parameter&amp;gt; 的任何值被捕获为字符串。您使用路径转换器，例如 &amp;lt;int:year&amp;gt;，专门匹配并返回一个整数和 &amp;lt;slug:post&amp;gt;专门匹配一个蛞蝓。您可以在 https://docs.djangoproject.com/en/4.0/topics/http/urls/#path-converters 查看 Django 提供的所有路径转换器。
+
+如果使用 path() 和转换器对您来说还不够，您可以使用 re_path() 来使用 Python 正则表达式定义复杂的 URL 模式。您可以在 https://docs 了解有关使用正则表达式定义 URL 模式的更多信息。 djangoproject.com/en/4.0/ref/urls/#django.urls.re_path。如果您以前没有使用过正则表达式，您可能需要查看位于 https://docs.python.org/3/howto/regex 的正则表达式 HOWTO。首先是html。
+
+> 为每个应用进程创建一个 urls.py 文档是使应用进程可由其他项目重用的最佳方式。
+
+接下来，您必须在项目的主 URL 模式中包含博客应用进程的 URL 模式。
+
+编辑位于项目的 mysite 目录中的 urls.py 文档，使其如下所示：
+```python
+from django.contrib import admin
+from django.urls import include, path
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('blog/', include('blog.urls', namespace='blog')),
+]
+```
+
+用 include 定义的新 URL 模式是指在博客应用进程中定义的 URL 模式，以便它们包含在 blog/path 下。您可以在命名空间博客下包含这些模式。命名空间在整个项目中必须是唯一的。稍后，您将使用命名空间，后跟冒号和 URL 名称（例如，blog：post_list 和 blog：post_detail）轻松引用您的博客 URL。有关 URL 命名空间的详细信息，请参阅 https:// docs.djangoproject.com/en/4.0/topics/http/urls/#url-namespaces。
+
+### 6.3 模型中规范 URL
+规范 URL 是资源的首选 URL。您的站点中可能有不同的页面用于显示帖子，但只有一个 URL 可用作博客帖子的主 URL。 Django 中的约定是将 `get_absolute_url()` 方法添加到返回对象的规范 URL 的模型中。
+
+您可以使用您在上一节中定义的 post_detail URL 来构建 Post 对象的规范 URL。对于此方法，您将使用 reverse() 方法，该方法允许您按名称构建 URL 并传递可选参数。您可以在 https://docs.djangoproject.com/en/4.0/ref/urlresolvers/ 了解有关 URL 实用进程功能的更多信息。
+
+编辑博客应用的models.py文档，添加如下代码：
+```python
+from django.urls import reverse
+def get_absolute_url(self):
+        '''规范绝对url'''
+        return reverse("blog:post_detail", kwargs=[self.publish.year, self.publish.month, self.publish.day, self.slug]) 
+```
+您将在模板中使用 get_absolute_url（） 方法链接到特定帖子。
+
+
+
+
 
 
 
