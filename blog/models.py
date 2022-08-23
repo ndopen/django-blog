@@ -5,10 +5,10 @@ from django.urls import reverse
 
 # Create your models here.
 
-class PublisedManager(models.Manager):
+class PublishedManager(models.Manager):
     '''定义published 模型管理方法，返回贴文状态为发布的对象'''
     def get_queryset(self):
-        return super(PublisedManager, self).get_queryset().filter(status = 'published')
+        return super(PublishedManager, self).get_queryset().filter(status = 'published')
 
 class Post(models.Model):
     '''
@@ -40,10 +40,10 @@ class Post(models.Model):
         return self.title
 
     objects = models.Manager()
-    published = PublisedManager()
+    published = PublishedManager()
 
     def get_absolute_url(self):
         '''规范绝对url'''
-        return reverse("blog:post_detail", kwargs=[self.publish.year, self.publish.month, self.publish.day, self.slug])
+        return reverse("blog:post_detail", args=[self.publish.year, self.publish.month, self.publish.day, self.slug])
     
 

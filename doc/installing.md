@@ -648,19 +648,241 @@ urlpatterns = [
 from django.urls import reverse
 def get_absolute_url(self):
         '''规范绝对url'''
-        return reverse("blog:post_detail", kwargs=[self.publish.year, self.publish.month, self.publish.day, self.slug]) 
+        return reverse("blog:post_detail", args=[self.publish.year, self.publish.month, self.publish.day, self.slug]) 
 ```
 您将在模板中使用 get_absolute_url（） 方法链接到特定帖子。
 
 
+## 7. 为您的视图创建模板
+您已经为博客应用进程创建了视图和 URLS。 URLs 将 URL 映射到视图，视图决定将哪些数据返回给用户。模板定义了数据的显示方式；它们通常是结合 Django 模板语言用 HTML 编写的。您可以在 https://docs.djangoproject.com/en/4.0/ref/templates/language/ 找到有关 Django 模板语言的更多信息。
+
+让我们将模板添加到您的应用中，以便以用户友好的方式显示帖子。
+
+在您的博客应用目录中创建以下目录和文档：
++ blog/
+    - templates/
+        - blog/
+            - base.html
+            - post/
+                - list.html
+                - detail.html
+
+前面的结构将是您的模板的文档结构。 base.html 文档将包含网站的主要 HTML 结构，并将内容分为主要内容区域和侧边栏。 list.html 和 detail.html 文档将从 base.html 文档继承以分别呈现博客文章列表和详细视图。
+
+Django 具有强大的模板语言，允许您指定数据的显示方式。它基于模板标签、模板变量和模板过滤器：
+- 模板标签控制模板的呈现，看起来像 {% tag %}
+- 模板变量在呈现模板时被替换为值，并且看起来像 {{ variable }}
+- 模板过滤器允许您修改要显示的变量，看起来像{{ variable|filter}}。
+
+您可以在 https://docs.djangoprojectcom/en/4.0/ref/templates/builtins/ 查看所有内置模板标签和过滤器。
+
+编辑 base.html 文档并添加以下代码：
+```html
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+</head>
+<body>
+    <div id='content'>
+        {% block content %}
+        {% endblock  %}
+    </div>
+
+    <div id='sidebar'> 
+        <h2>My Blog</h2>
+        <p>
+            this is my blog
+        </p>
+    </div>
+</body>
+</html>
+```
+
+{% load static %} 告诉 Django 加载 django.contrib.staticfiles 应用进程提供的静态模板标签，该应用进程包含在 INSTALLED_APPS 设置中。加载它们后，您可以在此模板中使用 {% static %} 模板标记。使用此模板标记，您可以包含静态文档，例如 blog.css 文档，您可以在此示例的代码中找到博客应用进程的 static/ 目录下。将本章附带的代码中的 static/ 目录复制到与项目相同的位置，以将 CSS 样式应用于模板。您可以在 https://github.com/PacktPublishing/Django-3-by-Example/tree/master/Chapter01/mysite/blog/static 中找到该目录的内容。
+
+您可以看到有两个 {% block %} 标记。这些告诉Django你想在那个区域定义一个块。从此模板继承的模板可以使用内容填充块。您已经定义了一个名为 title 的块和一个称为 content 的块。
+
+让我们编辑 post/list.html 文档，使其如下所示：
+```html
+{% extends 'blog/base.html' %}
+
+{% block title %}My Blog{% endblock  %}
+
+{% block content %}
+    <h1>My Blog</h1>
+
+    {% for post in posts %}
+        <h2>
+            <a href="{{ post.get_absolute_url }}">
+                {{ post.title }}
+            </a>
+        </h2>
+
+        <p>
+            published {{post.publish}} by {{ post.author }}
+        </p>
+
+        {{post.body | truncatewords:30 | linebreaks }}
+
+    {% endfor %}
+{% endblock  %}
+```
+
+使用 {% extends %} 模板标记，您可以告诉 Django 从 blog/base.html 模板继承。然后，用内容填充基本模板的标题和内容块。您可以循环访问帖子并显示其标题、日期、作者和正文，并在标题中包含指向帖子规范网址的链接.
+
+在文章的正文中，应用两个模板筛选器：`truncatewords:30`将值截断为指定的字数，`linebreaks`将输出转换为 HTML 换行符。您可以根据需要连接任意数量的模板过滤器;每个都将应用于由前一个生成的输出。
+
+打开 shell 并执行 python manage.py runserver 命令来启动开发服务器。在浏览器中打开 http://127.0.0.1:8000/blog/; 你会看到一切都在运行。请注意，您需要有一些状态为“已发布”的帖子才能在此处显示。您应该看到类似下面的内容：
+
+![PostList Image]()
+
+接下来，编辑 post/detail.html 文档：
+```html
+{% extends "blog/base.html" %}
+
+{% block title %} {{posts.title}} {% endblock  %}
+
+{% block content %}
+<h1>{{posts.title}}</h1>
+
+<p>
+    Published {{posts.publish}} by {{posts.author}}
+</p>
+
+{{posts.body | linebreaks}}
+
+{% endblock  %}
+```
+
+接下来，您可以返回浏览器并单击其中一个帖子标题以查看帖子的详细信息视图。您应该看到类似下面的内容：
+
+![This Is PostDetail Images]()
+
+看看URL -它应该是/blog/2020/1/1/who-was-django-reinhardt/。您已经为博客文章设计了SEO友好的URL。
+
+## 8. 添加分页
+当您开始向博客添加内容时，您可能很容易达到数据库中存储数十或数百篇文章的程度。您可能希望将帖子列表拆分为多个页面，而不是在单个页面上显示所有帖子。 这可以通过分页来实现。您可以定义要在每页显示的帖子数，并检索与用户请求的页面相对应的帖子。Django有一个内置的分页类，允许您轻松管理分页数据。
+
+编辑博客应用进程的 views.py 文档以导入 Django 分页器类并修改post_list视图，如下所示：
+```python
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+def post_list(request):
+    '''post list 视图方法 返回已发布所有posts'''
+    object_list = Post.published.all()
+    paginator = Paginator(object_list, 3)
+    page = request.GET.get('page')
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        # 如果页面不是整数，则传递第一页
+        posts = paginator.page(1)
+    except EmptyPage:
+        # 如果页面超出范围，则提供最后一页的结果
+        posts = paginator.page(paginator.num_pages)
 
 
+    return render(request, 'blog/post/list.html', {'posts' : posts, 'page':page})
+```
 
+这是分页的工作原理：
+1. 您可以使用要在每个页面上显示的对象数实例化 Paginator 类。
+2. 您将获得 page GET 参数，该参数指示当前页码。
+3. 您可以通过调用 Pageginator 的 page（） 方法来获取所需页面的对象。
+4. 如果 page 参数不是整数，则检索结果的第一页。 如果此参数是大于结果的最后一页的数字，则检索最后一页。
+5. 将页码和检索到的对象传递到模板。
 
+现在，您必须创建一个模板来显示分页器，以便它可以包含在任何使用分页的模板中。在博客应用进程的模板/文档夹中，创建一个新文档并将其命名为pagination.html。将以下 HTML 代码添加到文档中：
+```html
+<div class="pagination">
+    <span class="step-links">
+        {% if page.has_previous %}
+            <a href="?page={{page.previous_page_number}}">Previous</a>
+        {% endif %}
 
+        <span class="current">
+            Page {{page.number}} of {{page.paginator.num_pages}}.
+        </span>
 
+        {% if page.has_next %}
+            <a href="?page={{page.next_page_number}}">Next</a>
+        {% endif %}
+    </span>
+</div>
+```
 
+paginator模板需要一个 Page 对象，以便呈现上一个和下一个链接，并显示结果的当前页和总页数。让我们返回到 blog/post/list.html 模板，并在 {% content %} 块的底部包含paginator.html模板，如下所示：
+```html
+{% include "blog/pagination.html" with page=posts %}
+```
+由于要传递给模板的 Page 对象称为 post，因此请在 post 列表模板中包含分页模板，并传递参数以正确呈现它。您可以按照此方法在不同模型的分页视图中重用分页模板。
 
+现在在浏览器中打开 [http://127.0.0.1:8000/blog/](http://127.0.0.1:8000/blog/)。您应该在帖子列表的底部看到分页，并且应该能够在页面中导航：
 
+## 9. 使用基于类的视图
+基于类的视图是将视图实现为 Python 对象而不是函数的另一种方法。由于视图是接受 Web 请求并返回 Web 响应的可调用视图，因此还可以将视图定义为类方法。Django为此提供了基本视图类。它们都继承自 View 类，该类处理 HTTP 方法调度和其他常见功能。
 
+对于某些用例，基于类的视图比基于函数的视图具有优势。 它们具有以下功能：
+- 在与 HTTP 方法（如 GET、POST 或 PUT）相关的代码组织在单独的方法中，而不是使用条件分支
+- 使用多重继承创建可重用的视图类（也称为 mixins）
 
+您可以在 https://docs.djangoproject.com/en/4.0/topics/class-based-views/intro/ 查看基于类的视图的简介。 
+
+您将post_list视图更改为基于类的视图，以使用 Django 提供的通用 ListView。此基本视图允许您列出任何类型的对象。
+
+编辑博客应用进程的 views.py 文档，并添加以下代码：
+```python
+from django.views.generic import ListView
+
+class PostListView(ListView):
+    queryset = Post.published.all()
+    context_object_name = 'posts'
+    paginate_by = 3
+    template_name = 'blog/post/list.html'
+```
+这种基于类的视图类似于上一个post_list视图。在上面的代码中，您告诉 ListView 执行以下操作：
+- 使用特定的查询集，而不是检索所有对象。而不是定义查询集属性，你可以指定模型= Post，Django会为你构建通用的Post.objects.all（）QuerySet。
+- 对查询结果使用上下文变量发布。如果未指定任何context_object_name，则默认变量为object_list。
+- 对结果进行分页，每页显示三个对象。
+- 使用自定义模板呈现页面。如果未设置默认模板，ListView 将使用 blog/post_list.html。
+
+现在打开博客应用进程的 urls.py 文档，注释前面的post_列表 URL 模式，并使用 PostListView 类添加新的 URL 模式，如下所示：
+```python
+from django.urls import path
+from . import views
+app_name = 'blog'
+
+urlpatterns = [
+    # post urls
+    path('', views.PostListView.as_view(), name='post_list'),
+    path('<int:year>/<int:month>/<int:day>/<slug:post>/', views.post_detail, name='post_detail'),
+]
+```
+
+为了保持分页工作，必须使用传递给模板的正确页面对象。Django的ListView视图数据在一个名为page_obj的变量中传递所选页面，因此您必须相应地编辑 post/list.html 模板以使用正确的变量包含分页器，如下所示：
+```python
+{% include "blog/pagination.html" with page=page_obj %}
+```
+在浏览器中打开 [http://127.0.0.1:8000/blog/](http://127.0.0.1:8000/blog/)，并验证所有内容的工作方式是否与上一个post_list视图相同。这是一个基于类的视图的简单示例，它使用 Django 提供的泛型类。您将在第 10 章 “构建电子学习平台” 和后续章节中了解有关基于类的视图的更多信息。
+
+## 10. 概要
+在本章中，您通过创建一个简单的博客应用进程学习了Django Web框架的基础知识。您设计了数据模型并将迁移应用于项目。您还为博客创建了视图、模板和 URL，包括对象分页。
+
+在下一章中，您将了解如何使用评论系统和标记功能增强博客应用进程，以及如何允许用户通过电子邮件共享帖子。
+
+# 使用高级功能增强您的博客
+## 通过电子邮件分享您的 Posts
+
+## 创建评论系统
+
+## 添加标签功能
+
+## 按相似性检索帖子
+
+## 摘要
