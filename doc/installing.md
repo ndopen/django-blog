@@ -76,7 +76,7 @@ django-admin startproject mysite .
     - __init__.py：一个空文档，告诉 Python 将 mysite 目录视为 Python 模块。
     - asgi.py：这是将项目作为 ASGI 运行的配置，ASGI 是用于异步 Web 服务器和应用进程的新兴 Python 标准。
     - settings.py：这表明您的项目的设置和配置，并包含初始默认设置。
-    - urls.py：这是您的 URL 模式所在的地方。此处定义的每个 URL 都映射到一个视图。
+    - urls.py：这是您的 URL 所在的地方。此处定义的每个 URL 都映射到一个视图。
     - wsgi.py：这是将项目作为 Web 服务器网关接口 （WSGI） 应用进程运行的配置。
 
 生成的 settings.py 文档包含项目设置，包括使用 SQLite3 数据库的基本配置和名为 INSTALLED_APPS 的列表，其中包含默认情况下添加到项目中的常见 Django 应用进程。 稍后我们将在“项目设置”部分中介绍这些应用进程。
@@ -138,9 +138,9 @@ python manage.py runserver 127.0.0.1:8001
 让我们打开 settings.py 文档，并查看项目的配置。 Django在此文档中包含了几个设置，但这些只是所有可用Django设置的一部分。您可以在 https://docs.djangoproject.com/en/3.0/ref/settings/ 查看所有设置及其默认值。
 
 以下设置值得一看：
-- DEBUG 是一个布尔值，用于打开和关闭项目的调试模式。如果设置为 True，当您的应用进程抛出未捕获的异常时，Django 将显示详细的错误页面。当您迁移到生产环境时，请记住您必须将其设置为 False。切勿在启用调试的情况下将站点部署到生产环境中，因为您将暴露与项目相关的敏感数据。
+- DEBUG 是一个布尔值，用于打开和关闭项目的调试。如果设置为 True，当您的应用进程抛出未捕获的异常时，Django 将显示详细的错误页面。当您迁移到生产环境时，请记住您必须将其设置为 False。切勿在启用调试的情况下将站点部署到生产环境中，因为您将暴露与项目相关的敏感数据。
 
-- ALLOWED_HOSTS 在调试模式打开或运行测试时不应用。将站点移动到生产环境并将 DEBUG 设置为 False 后，您必须将域/主机添加到此设置中，以允许它为您的 Django 站点提供服务。
+- ALLOWED_HOSTS 在调试打开或运行测试时不应用。将站点移动到生产环境并将 DEBUG 设置为 False 后，您必须将域/主机添加到此设置中，以允许它为您的 Django 站点提供服务。
 
 - INSTALLED_APPS是您必须为所有项目编辑的设置。此设置告诉Django哪些应用进程在此站点上处于活动状态。默认情况下，Django包括以下应用进程：
     + django.contrib.admin：一个管理站点
@@ -152,7 +152,7 @@ python manage.py runserver 127.0.0.1:8001
 
 - MIDDLEWARE 是一个列表，其中包含要执行的中间件。
 
-- ROOT_URLCONF 表示定义应用进程的根 URL 模式的 Python 模块。
+- ROOT_URLCONF 表示定义应用进程的根 URL 的 Python 模块。
 - DATABASES 是一个字典，其中包含要在项目中使用的所有数据库的设置。必须始终存在默认数据库。默认配置使用 SQLite3 数据库。
 - LANGUAGE_CODE定义了此Django站点的默认语言代码。
 - USE_TZ 告诉 Django 激活/停用时区支持。 Django 支持时区感知日期时间。当您使用 startproject 管理命令创建新项目时，此设置设置为 True。
@@ -193,7 +193,7 @@ python manage.py startapp blog
 
 
 ## 3. 设计博客数据架构
-您将通过为您的博客定义数据模型来开始设计您的博客数据模式。模型是一个 Python 类，它是 django.db.models.Model 的子类，其中每个属性代表一个数据库字段。 Django 将为 models.py 文档中定义的每个模型创建一个表。当你创建一个模型时，Django 会为你提供一个实用的 API 来方便地查询数据库中的对象。
+您将通过为您的博客定义数据模型来开始设计您的博客数据。模型是一个 Python 类，它是 django.db.models.Model 的子类，其中每个属性代表一个数据库字段。 Django 将为 models.py 文档中定义的每个模型创建一个表。当你创建一个模型时，Django 会为你提供一个实用的 API 来方便地查询数据库中的对象。
 
 首先，您需要定义一个 Post models。将以下行添加到博客应用进程的 models.py 文档中：
 ```python
@@ -566,7 +566,7 @@ Post.published.filter(title__startswith='Who')
 ## 6. 构建List和PostDetail视图
 现在，您已经了解了如何使用 ORM，接下来就可以构建博客应用的视图了。Django Views只是一个Python函数，它接收Web请求并返回Web响应。返回所需响应的所有逻辑都位于视图内部。
 
-首先，您将创建应用进程视图，然后为每个视图定义一个 URL 模式，最后，您将创建 HTML 模板来呈现视图生成的数据。每个视图都会渲染一个模板，将变量传递给它，并返回一个带有渲染输出的 HTTP 响应。
+首先，您将创建应用进程视图，然后为每个视图定义一个 URL ，最后，您将创建 HTML 模板来呈现视图生成的数据。每个视图都会渲染一个模板，将变量传递给它，并返回一个带有渲染输出的 HTTP 响应。
 
 ### 6.1 创建List和detail视图
 让我们首先创建一个视图来显示帖子列表。编辑您的博客应用进程的 views.py 文档，使其如下所示：
@@ -596,7 +596,7 @@ def post_detail(request, post, year, month, day):
 这是帖子详细信息视图。此视图采用年、月、日和帖子参数来检索具有给定辅助信息区和日期的已发布帖子。请注意，在创建 Post 模型时，已将 unique_for_date 参数添加到辅助信息域。这可确保在给定日期内只有一个帖子具有辅助信息交换，因此，您可以使用日期和数据域来检索单个信息。在详细信息视图中，使用 get_object_or_404（） 快捷方式检索所需的帖子。此函数检索与给定参数匹配的对象，如果未找到任何对象，则检索 HTTP 404（未找到）异常。最后，使用 render（） 快捷方式通过模板呈现检索到的帖子。
 
 ### 6.2 为您的视图添加 URL
-URL 模式允许您将 URL 映射到视图。URL 模式由字符串、视图和允许您在项目范围内命名 URL 的名称（可选）组成。Django贯穿每个URL模式，并在与请求的URL匹配的第一个模式处停止。然后，Django 导入匹配的 URL 模式的视图并执行它，传递 HttpRequest 类的实例和关键字或位置参数。
+URL 允许您将 URL 映射到视图。URL 由字符串、视图和允许您在项目范围内命名 URL 的名称（可选）组成。Django贯穿每个URL，并在与请求的URL匹配的第一个处停止。然后，Django 导入匹配的 URL 的视图并执行它，传递 HttpRequest 类的实例和关键字或位置参数。
 
 在博客应用进程的目录中创建一个 urls.py 文档，并在其中添加以下行：
 ```python
@@ -611,19 +611,19 @@ urlpatterns = [
 ]
 ```
 
-在上面的代码中，使用 app_name 变量定义应用进程命名空间。这允许您按应用进程组织 URL，并在引用它们时使用该名称。您可以使用 path（） 函数定义两种不同的模式。第一个 URL 模式不采用任何参数，并映射到post_list视图。 第二个模式采用以下四个参数，并映射到post_详细信息视图：
+在上面的代码中，使用 app_name 变量定义应用进程命名空间。这允许您按应用进程组织 URL，并在引用它们时使用该名称。您可以使用 path（） 函数定义两种不同的。第一个 URL 不采用任何参数，并映射到post_list视图。 第二个采用以下四个参数，并映射到post_详细信息视图：
 - year：需要一个整数
 - month：需要一个整数 
 - day：需要一个整数 
 - post：可以由单词和连字符组成
 
-您使用尖括号从 URL 中捕获值。在 URL 模式中指定为 &amp;lt;parameter&amp;gt; 的任何值被捕获为字符串。您使用路径转换器，例如 &amp;lt;int:year&amp;gt;，专门匹配并返回一个整数和 &amp;lt;slug:post&amp;gt;专门匹配一个蛞蝓。您可以在 https://docs.djangoproject.com/en/4.0/topics/http/urls/#path-converters 查看 Django 提供的所有路径转换器。
+您使用尖括号从 URL 中捕获值。在 URL 中指定为 &amp;lt;parameter&amp;gt; 的任何值被捕获为字符串。您使用路径转换器，例如 &amp;lt;int:year&amp;gt;，专门匹配并返回一个整数和 &amp;lt;slug:post&amp;gt;专门匹配一个蛞蝓。您可以在 https://docs.djangoproject.com/en/4.0/topics/http/urls/#path-converters 查看 Django 提供的所有路径转换器。
 
-如果使用 path() 和转换器对您来说还不够，您可以使用 re_path() 来使用 Python 正则表达式定义复杂的 URL 模式。您可以在 https://docs 了解有关使用正则表达式定义 URL 模式的更多信息。 djangoproject.com/en/4.0/ref/urls/#django.urls.re_path。如果您以前没有使用过正则表达式，您可能需要查看位于 https://docs.python.org/3/howto/regex 的正则表达式 HOWTO。首先是html。
+如果使用 path() 和转换器对您来说还不够，您可以使用 re_path() 来使用 Python 正则表达式定义复杂的 URL 。您可以在 https://docs 了解有关使用正则表达式定义 URL 的更多信息。 djangoproject.com/en/4.0/ref/urls/#django.urls.re_path。如果您以前没有使用过正则表达式，您可能需要查看位于 https://docs.python.org/3/howto/regex 的正则表达式 HOWTO。首先是html。
 
 > 为每个应用进程创建一个 urls.py 文档是使应用进程可由其他项目重用的最佳方式。
 
-接下来，您必须在项目的主 URL 模式中包含博客应用进程的 URL 模式。
+接下来，您必须在项目的主 URL 中包含博客应用进程的 URL 。
 
 编辑位于项目的 mysite 目录中的 urls.py 文档，使其如下所示：
 ```python
@@ -636,7 +636,7 @@ urlpatterns = [
 ]
 ```
 
-用 include 定义的新 URL 模式是指在博客应用进程中定义的 URL 模式，以便它们包含在 blog/path 下。您可以在命名空间博客下包含这些模式。命名空间在整个项目中必须是唯一的。稍后，您将使用命名空间，后跟冒号和 URL 名称（例如，blog：post_list 和 blog：post_detail）轻松引用您的博客 URL。有关 URL 命名空间的详细信息，请参阅 https:// docs.djangoproject.com/en/4.0/topics/http/urls/#url-namespaces。
+用 include 定义的新 URL 是指在博客应用进程中定义的 URL ，以便它们包含在 blog/path 下。您可以在命名空间博客下包含这些。命名空间在整个项目中必须是唯一的。稍后，您将使用命名空间，后跟冒号和 URL 名称（例如，blog：post_list 和 blog：post_detail）轻松引用您的博客 URL。有关 URL 命名空间的详细信息，请参阅 https:// docs.djangoproject.com/en/4.0/topics/http/urls/#url-namespaces。
 
 ### 6.3 模型中规范 URL
 规范 URL 是资源的首选 URL。您的站点中可能有不同的页面用于显示帖子，但只有一个 URL 可用作博客帖子的主 URL。 Django 中的约定是将 `get_absolute_url()` 方法添加到返回对象的规范 URL 的模型中。
@@ -852,7 +852,7 @@ class PostListView(ListView):
 - 对结果进行分页，每页显示三个对象。
 - 使用自定义模板呈现页面。如果未设置默认模板，ListView 将使用 blog/post_list.html。
 
-现在打开博客应用进程的 urls.py 文档，注释前面的post_列表 URL 模式，并使用 PostListView 类添加新的 URL 模式，如下所示：
+现在打开博客应用进程的 urls.py 文档，注释前面的post_列表 URL ，并使用 PostListView 类添加新的 URL ，如下所示：
 ```python
 from django.urls import path
 from . import views
@@ -877,9 +877,445 @@ urlpatterns = [
 在下一章中，您将了解如何使用评论系统和标记功能增强博客应用进程，以及如何允许用户通过电子邮件共享帖子。
 
 # 使用高级功能增强您的博客
-## 通过电子邮件分享您的 Posts
+在上一章中，您创建了一个基本的博客应用进程。接下来，您将把应用进程变成一个功能齐全的博客，具有当今许多博客所具有的高级功能。您将在博客中实现以下功能：
 
-## 创建评论系统
+- 通过电子邮件分享帖子：当读者喜欢某篇文章时，他们可能希望与他人分享。您将实现通过电子邮件共享帖子的功能。
+- 向帖子添加评论：许多人希望允许其分享对象对帖子发表评论并创建讨论。您将让读者为您的博客文章添加评论。
+- 标记帖子：标记允许您使用简单的关键字以非分层方式对内容进行分类。您将实现一个标记系统，这是博客中非常受欢迎的功能。
+- 推荐类似的帖子：一旦您有了分类方法（例如标记系统），您就可以使用它为读者提供内容推荐。您将构建一个系统，推荐与某个博客文章共享标签的其他帖子。
+
+这些功能将使您的应用进程变成一个功能齐全的博客。
+
+在本章中，我们将介绍以下主题：
+- 使用Django发送电子邮件
+- 创建forms并在视图中处理它们
+- 从模型创建表单
+- 集成第三方应用进程
+- 构建复杂的查询集
+
+## 1. 通过电子邮件分享您的 Posts
+首先，让我们允许用户通过电子邮件发送帖子来共享帖子。花点时间考虑如何使用视图、URL 和模板，使用您在上一章中学到的知识来创建此功能。为了允许用户通过电子邮件共享帖子，您需要执行以下操作：
+- 创建表单供用户填写其姓名、电子邮件、电子邮件收件人和可选注释
+- 在 views.py 文档中创建一个视图，用于处理已发布的数据并发送电子邮件
+- 在博客应用进程的 urls.py 文档中为新视图添加 URL 路由
+- 创建一个模板以显示表单 使用Django创建表单
+
+### 1.1 使用Django创建表单
+让我们从构建表单以共享帖子开始。Django有一个内置的表单框架，允许您以简单的方式创建表单。通过表单框架，可以轻松地定义表单的字段、指定这些字段的显示方式以及指示它们必须如何验证输入数据。Django表单框架提供了一种灵活的方法来呈现表单和处理数据。
+
+Django附带了两个基类来构建表单：
+- `Form` : 允许您构建标准表单
+- `ModelForm`:允许您构建与模型实例绑定的表单
+
+首先，在博客应用进程的目录中创建一个 forms.py 文档，并使其如下所示：
+```python
+from django import forms
+
+class EmailPostForm(forms.Form):
+    name = forms.CharField(max_length=250)
+    email = forms.EmailField()
+    to = forms.EmailField()
+    comments = forms.CharField(required=False, widget=forms.Textarea)
+```
+
+这是你的第一个Django forms。看看代码。您已经通过继承基 Form 类创建了一个表单。您可以使用Django的不同字段类型来相应地验证字段
+> 表单可以驻留在 Django 项目中的任何位置。约定是将它们放在每个应用进程的 forms.py 文档中。
+
+
+name 字段为 CharField。这种类型的字段呈现为 `<input="text">` HTML 元素。每种字段类型都有一个默认`widget`，用于确定字段在 HTML 中的呈现方式。可以使用微件属性覆盖默认微件。在注释字段中，您可以使用Textarea构件将其显示为`<textarea>` HTML 元素，而不是默认的`<input>`元素。
+
+字段验证还取决于字段类型。例如，`email` 和 `to` 是电子邮件字段。这两个字段都需要有效的电子邮件地址;否则，字段验证将引发表单验证错误异常，表单将不会进行验证。表单验证还考虑了其他参数：为 name 字段定义的最大长度为 25 个字符;并使用 required=False 使注释字段可选。在进行现场验证时，还会考虑所有这些因素。此表单中使用的字段类型只是 Django 表单字段的一部分。有关所有可用表单域的列表，请访问 [Form fields](https://docs.djangoproject.com/en/4.0/ref/forms/fields/)
+
+### 1.2 处理视图中的表单
+您需要创建一个新视图来处理表单，并在成功提交表单时发送电子邮件。编辑博客应用进程的 views.py 文档，并向其添加以下代码：
+```python
+from .forms import EmailPostForm
+
+def post_share(request, post_id):
+    '''post in email share'''
+    # 通过id检索post
+    post = get_object_or_404(Post, id=post_id, status = 'published')
+    if request.method == 'POST':
+        # 提交form
+        form = EmailPostForm(request.POST)
+        if form.is_vaild():
+            # 表单域已通过验证
+            cd = form.cleaned_data
+    else:
+        form = EmailPostForm()
+
+    return render(request, 'blog/post/share.html', {'post':post, 'form':form})
+```
+
+此视图的工作原理如下：
+1. 定义将`request`和`post_ id`变量作为参数的`post_share`视图。
+2. 您可以使用 get_object_or_404（） 快捷方式按 ID 检索帖子，并确保检索到的帖子具有已发布状态。
+3. 您可以使用相同的视图来显示初始表单和处理提交的数据。您可以根据请求方法区分表单是否已提交，并使用 POST 提交表单。您假设如果收到 GET 请求，则必须显示一个空表单，并且如果收到 POST 请求，则表单已提交并需要处理。因此，您可以使用 request.method == 'POST' 来区分这两种情况。
+
+以下是显示和处理表单的过程：
+1. 当视图最初加载 GET 请求时，您将创建一个新的表单实例，该实例将用于在模板中显示空表单：`form = EmailPostForm()`
+2. 用户填写表单并通过 POST 提交。然后，使用请求中包含的提交数据创建表单实例。发布：
+    ```python
+    if request.method == 'POST':
+    # 提交form
+    form = EmailPostForm(request.POST)
+    ```
+3. 在此之后，您可以使用表单的 is_valid（） 方法验证提交的数据。此方法验证表单中引入的数据，如果所有字段都包含有效数据，则返回 True。如果任何字段包含无效数据，则 is_valid（） 返回 False。您可以通过访问 form.errors 来查看验证错误列表。
+4. 如果表单无效，则使用提交的数据再次在模板中呈现表单。您将在模板中显示验证错误。
+5. 如果表单有效，则通过访问表单来检索已验证的数据。 cleaned_data 此属性是表单域及其值的字典。
+> 如果表单数据未验证，cleaned_data将仅包含有效字段。
+
+现在，让我们探索如何使用Django发送电子邮件以将所有内容放在一起。
+
+### 1.3 使用Django发送电子邮件
+使用Django发送电子邮件非常简单。首先，您需要具有本地简单邮件传输协议 （SMTP） 服务器，或者需要通过将以下设置添加到项目的 settings.py 文档中来定义外部 SMTP 服务器的配置：
+
+- EMAIL_HOST：SMTP 服务器主机;默认值为本地主机
+- EMAIL_PORT：SMTP 端口;默认值为 25
+- EMAIL_HOST_USER：SMTP 服务器的用户名
+- EMAIL_HOST_PASSWORD：SMTP 服务器的密码
+- EMAIL_USE_TLS：是否使用传输层安全性 （TLS） 安全连接
+- EMAIL_USE_SSL：是否使用隐式 TLS 安全连接
+
+如果您无法使用SMTP服务器，则可以通过将以下设置添加到 settings.py 文档来告诉Django将电子邮件写入控制台：
+```python
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+```
+通过使用此设置，Django会将所有电子邮件输出到shell。这对于在没有 SMTP 服务器的情况下测试应用进程非常有用。
+
+如果要发送电子邮件但没有本地 SMTP 服务器，则可以使用电子邮件服务提供商的 SMTP 服务器。以下示例配置适用于使用 Google 帐户通过 Gmail 服务器发送电子邮件：
+```conf
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'your_account@gmail.com'
+EMAIL_HOST_PASSWORD = 'your_password'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+```
+
+运行 python manage.py shell 命令以打开 Python shell 并发送电子邮件，如下所示：
+```shell
+>>> from django.core.mail import send_mail
+>>> send_mail('Django mail', 'This e-mail was sent with Django.', 'your_account@gmail.com', ['your_account@gmail.com'], fail_silently=False)
+```
+
+send_mail（） 函数将主题、消息、发件人和收件人列表作为必需参数。通过将可选参数设置为 fail_silently=False，您可以告诉它在电子邮件无法正确发送时引发异常。如果您看到的输出为 1，则表示您的电子邮件已成功发送。
+
+如果您使用具有上述配置的Gmail发送电子邮件，则必须启用安全性较低的应用进程的访问权限。 https://myaccount.google.com/lesssecureapps，如下所示：
+
+![google setting image]()
+
+在博客应用进程的 views.py 文档中编辑post_share视图，如下所示：
+```python
+from django.core.mail import send_mail
+def post_share(request, post_id):
+    '''post in email share'''
+    # 通过id检索post
+    post = get_object_or_404(Post, id=post_id, status = 'published')
+    sent = False
+
+    if request.method == 'POST':
+        # 提交form
+        form = EmailPostForm(request.POST)
+        if form.is_valid():
+            # 表单域已通过验证
+            cd = form.cleaned_data
+            post_url = request.build_absolute_uri(post.get_absolute_url())
+            subject = f"{cd['name']} recommends you read" f"{post.title}"
+            message = f"Read {post.title} at {post_url}\n\n" f"{cd['name']}\'s comments: {cd['comments']}"
+            send_mail(subject, message, 'admin@myblog.com', [cd['to']])
+            sent = True
+    else:
+        form = EmailPostForm()
+
+    return render(request, 'blog/post/share.html', {'post':post, 'form':form, 'sent':sent})
+```
+
+如果您使用的是 SMTP 服务器而不是控制台 EmailBackend，请将 admin@myblog.com 替换为您的真实电子邮件帐户。
+
+在上面的代码中，您声明了一个已发送变量，并在发送帖子时将其设置为 True。稍后将在模板中使用该变量在成功提交表单时显示成功消息。
+
+由于您必须在电子邮件中包含指向帖子的链接，因此请使用其get_absolute_url（）方法检索帖子的绝对路径。您可以使用此路径作为request.build_absolute_uri（） 的输入来构建完整的 URL，包括 HTTP 架构和主机名。使用已验证表单的已清理数据构建电子邮件的主题和邮件正文，最后将电子邮件发送到表单的 to 字段中包含的电子邮件地址。
+
+现在您的视图已完成，请记住为其添加新的 URL 模式。打开博客应用进程的 urls.py 文档并添加post_share URL 模式，如下所示：
+
+### 1.4 在模板中呈现表单
+创建form、对视图进行编程并添加 URL 路由后，您只是缺少此视图的模板。在`blog/templates/blog/post/`目录中创建一个新文档，并将其命名为`share.html`。向其添加以下代码：
+```html
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    {% if sent %}
+        <h1>E-mail successfully sent</h1>
+        <p>
+            "{{post.title}}" was successfully sent to {{form.cleaned_data.to}}.
+        </p>
+    {% else %}
+        <h1>Share "{{post.title}} by email"</h1>
+        <form method="post">
+            {{form.as_p}}
+            {% csrf_token %}
+            <input type="submit" value="Send e-mail">
+        </form>
+    {% endif %}
+{% endblock  %}
+```
+这是在发送表单或成功消息时显示表单或成功消息的模板。您会注意到，您创建了 HTML 表单元素，指示它必须由 POST 方法提交：
+```python
+<form method="post">
+```
+
+然后，包括实际的表单实例。你告诉Django用`as_p`方法在HTML段落`<p>`;元素中呈现它的字段。还可以将窗体呈现为包含`as_ul`的无串行表或具有`as_table`的 HTML 表。如果要呈现每个字段，可以循环访问字段` {{ form.as_p }}`，如以下示例所示：
+```html
+{% for field in form %}
+    <div>
+        {{ field.errors }}
+        {{ field.label_tag }} {{ field }}
+    </div>
+{% endfor %}
+```
+`{% csrf_token %}` 模板标记引入了一个带有自动生成令牌的隐藏字段，以避免跨站点请求伪造 `（CSRF）` 攻击。这些攻击包括恶意网站或进程对您网站上的用户执行不需要的操作。您可以在 [https://owasp.org/www-community/attacks/csrf](https://owasp.org/www-community/attacks/csrf) 找到有关此内容的更多信息。 
+
+前面的标记会生成一个隐藏字段，如下所示：
+```html
+<input type='hidden' name='csrfmiddlewaretoken' value='26JjKo2lcEtYkGoV9z4XmJIEHLXN5LDR' />
+```
+> 默认情况下，Django 会检查所有 POST 请求中的 CSRF 令牌。 请记住在通过 POST 提交的所有表单中包含csrf_token标记。
+
+编辑 blog/post/detail.html 模板，并在 {{ post.body|linebreaks }} 变量之后添加以下链接，以共享帖子 URL：
+```html
+<p>
+    <a href="{% url "blog:post_share" posts.id %}">
+        share this post
+    </a>
+</p>
+```
+
+请记住，您是使用 Django 提供的 {% url %} 模板标记动态构建 URL 的。您正在使用名为 blog 的命名空间和名为 post_share 的 URL，并且您正在将帖子 ID 作为参数传递以构建绝对 URL。
+
+现在，使用 python manage.py runserver 命令启动开发服务器，并在浏览器中打开 http://127.0.0.1:8000/blog/。点击任何帖子标题以查看其详情页面。在帖子正文下，您应该会看到刚刚添加的链接，如以下屏幕截图所示：
+
+![demo postDetailtemplates images]()
+
+单击“共享此帖子”，您应该会看到该页面，包括通过电子邮件共享此帖子的表单，如下所示：
+
+![demo PostShareTemplates images]()
+
+表单的 CSS 样式包含在 static/css/blog.css 文档的示例代码中。当您单击“发送电子邮件”按钮时，将提交并验证表单。如果所有字段都包含有效数据，则会收到一条成功消息，如下所示：
+
+![PostShareSuccessfully sent Image]()
+
+如果输入无效数据，将再次呈现表单，包括所有验证错误：
+
+![PostShare Imput errors Image]()
+
+请注意，某些现代浏览器会阻止您提交包含空或错误字段的表单。这是因为浏览器根据字段类型和每个字段的限制执行表单验证。在这种情况下，将不会提交表单，浏览器将为错误的字段显示一条错误消息。
+
+您通过电子邮件共享帖子的表单现已完成。现在，让我们为您的博客创建一个评论系统。
+
+## 2. 创建评论系统
+您将构建一个评论系统，其中用户将能够对帖子发表评论。 要构建评论系统，您需要执行以下操作：
+1. 创建模型以保存comment
+2. 创建表单以提交注释并验证输入数据
+3. 添加处理表单视图并将新comment保存到数据库
+4. 编辑帖子详细信息模板以显示评论列表和表单以添加新评论
+
+### 2.1 构建 models
+首先，让我们构建一个模型来存储comment。打开博客应用进程的 models.py 文档，并添加以下代码：
+```python
+class Comment(models.Model):
+    '''Comment system models'''
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    name = models.CharField(max_length=80)
+    email = models.EmailField(max_length=254)
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default = True)
+
+    def __str__(self):
+        return f"comment by {self.name} on {self.post}"
+
+    class Meat():
+        ordering = ('created',)
+```
+
+这是您的评论模型。它包含一个外键(`ForeignKey`)，用于将评论与单个帖子相关联。这种多对一关系在评论模型中定义，因为每个评论都将在一个帖子上进行，并且每个帖子可能有多个评论。
+
+`related_name`属性允许您将用于关系的属性从相关对象**重命名此属性**。定义此内容后，您可以使用 `comment.post` 检索评论对象的帖子，并使用`post.comments.all（）`检索帖子的所有评论。如果不定义`related_ name` 属性，Django 将使用小写的模型名称，后跟 _ set（即 `comment_set`）来命名相关对象与模型对象的关系。
+
+您可以在 https://docs.djangoproject.com/en/4.0/topics/db/examples/many_to_one/ 了解有关多对一关系的更多信息。
+
+您已经包含了一个 `active Boolean` 字段，您将使用该字段手动停用不适当的注释。默认情况下，您可以使用 `created` 字段按时间顺序对 comment 进行排序。
+
+您刚刚创建的新 `Comment` 模型尚未同步到数据库中。运行以下命令以生成反映新模型创建的新迁移：
+```shell
+python manage.py makemigrations blog
+```
+
+Django在博客应用进程的迁移/目录中生成了一个0002_comment.py文档。现在，您需要创建相关的数据库架构并将更改应用于数据库。运行以下命令以应用现有迁移：
+```shell
+python manage.py migrate
+
+Operations to perform:
+  Apply all migrations: admin, auth, blog, contenttypes, sessions
+Running migrations:
+  Applying blog.0002_comment... OK
+```
+
+您刚刚创建的迁移已应用;现在数据库中存在一个blog_comment表。
+
+接下来，您可以将新模型添加到管理站点，以便通过简单的界面管理 `comment`。打开博客应用进程的 `admin.py` 文档，导入注释模型，然后添加以下 `ModelAdmin` 类：
+```python
+from .models import Comment
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'post', 'created', 'active')
+    list_filter = ('active', 'created', 'updated')
+    search_fields = ('name', 'email', 'body')
+```
+使用 python manage.py runserver 命令启动开发服务器，并在浏览器中打开 [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/)。您应该会看到“博客”部分中包含的新模型，如以下屏幕截图所示：
+
+![Admin Comment Images]()
+
+该模型现已在管理站点中注册，您可以使用简单的界面管理 Comment 实例。
+
+### 2.2 从模型创建表单
+您仍然需要构建一个表单，以便让用户对博客文章发表评论。请记住，Django 有两个基类来构建表单：`Form` 和 `ModelForm`。您之前使用过第一个，让您的用户通过电子邮件共享帖子。在本例中，您将需要使用 `ModelForm`，因为您必须从`Comment`模型动态生成表单。编辑博客应用进程的 forms.py 文档，并添加以下行：
+```python
+class CommentForm(forms.ModelForm):
+    '''Comment Forms'''
+    class Meta:
+        model = Comment
+        fields = ('name', 'email', 'body')
+```
+
+
+要从模型创建表单，您只需指示要使用哪个模型在表单的 Meta 类中构建表单。Django 会内省模型，并为您动态构建表单。
+
+每个模型字段类型都有相应的默认表单字段类型。在进行表单验证时，将考虑定义模型字段的方式。默认情况下，Django 为模型中包含的每个字段构建一个表单字段。但是，您可以使用字段列表显式告知框架要在表单中包含哪些字段，或者使用字段的排除列表定义要排除的字段。对于您的 CommentForm 表单，您将仅使用名称、电子邮件和正文本段，因为这些是您的用户能够填写的唯一字段。
+
+### 2.3 处理模型表单的视图
+您将使用`post detail`视图来实例化表单并对其进行处理，以保持其简单性。编辑 views.py 文档，为`Comment`模型和`CommentForm`添加导入，并修改post_detail视图以使其如下所示：
+```python
+from .models import Comment
+
+def post_detail(request, post, year, month, day):
+    '''post detail 视图，返回请求条件相符合的Post'''
+    posts = get_object_or_404(Post, slug = post, status='published', publish__year=year, publish__month=month, publish__day=day)
+
+    # list of active comment for the this post
+    comments = posts.comments.filter(active = True)
+    new_comment = None
+
+    if request.method == 'POST':
+        # a comment was posted
+        comment_form = CommentForm(data = request.POST)
+        if comment_form.is_valid():
+            # Create Comment object but don't save to database yet
+            new_comment = comment_form.save(commit=False)
+            # Assign the current post to the comment
+            new_comment.post = posts
+            # Save the comment to the database
+            new_comment.save()
+    else:
+        comment_form = CommentForm()
+
+return render(request, 'blog/post/detail.html', {'posts' : posts, 'comments':comments, 'new_comment': new_comment, 'comment_form': comment_form})
+```
+
+让我们回顾一下您添加到视图中的内容。您使用post_detail视图来显示帖子及其评论。您添加了一个 QuerySet 来检索此帖子的所有active=true 的comment，如下所示：
+```python
+comments = posts.comments.filter(active = True)
+```
+从 `post` 对象开始生成此 `QuerySet`。无需直接为`CommentModels`生成QuerySet，而是利用 `post` 对象来检索相关的 `Comment` 对象。您可以使用 `Manager` 来管理通过 `CommnetModels` 中关系的 `related_name` 属性定义为Comment的相关对象。您可以使用同一视图让用户添加新评论。通过将new_comment变量设置为`None`来初始化该变量。创建新评论时，您将使用此变量。
+
+如果视图由 GET 请求调用，则使用 `comment_form = CommentForm（）` 构建表单实例。如果请求是通过 POST 完成的，则使用提交的数据实例化表单，并使用 is_valid（） 方法对其进行验证。如果表单无效，则呈现带有验证错误的模板。如果表单有效，则执行以下操作：
+
+1. 通过调用`comment_form.save（）` 方法创建 新的 Comment 对象，并将其分配给`new_comment`变量，如下所示：
+
+```python
+new_comment = comment_form.save(commit=False)
+```
+save（） 方法创建表单链接到的模型的实例，并将其保存到数据库中。如果使用 `commit=False` 调用它，则创建模型实例，但尚未将其保存到数据库中。当您想在最终保存对象之前修改对象时，这会派上用场，这是您接下来要做的。
+
+> save（） 方法可用于 ModelForm，但不适用于 Form 实例，因为它们未链接到任何模型
+
+2. 您将当前帖子分配给您刚刚创建的评论：
+```python
+new_comment.post = posts
+```
+通过执行此操作，您可以指定新评论属于此帖子。
+3. 最后，通过调用其 save（） 方法将`new_comment`保存到数据库中：
+```python
+new_comment.save()
+```
+
+您的视图现在已准备好显示和处理新的评论。
+
+### 2.4 向帖子详细信息模板添加评论
+您已经创建了管理帖子评论的功能。现在，您需要调整 `post/detail.html` 模板以执行以下操作：
+- 显示帖子的评论总数
+- 显示评论列表
+- 显示表单以供用户添加新评论
+
+首先，您将添加总评论。打开 post/detail.html 模板，并将以下代码追加到内容块：
+```python
+    {% with comments.count as total_comments %}
+        <h2>
+            {{ total_comments }} comment {{total_comments | pluralize}}
+        </h2>
+    {% endwith %}
+```
+
+您正在模板中使用 `Django ORM`，执行 QuerySet `comments.count（）`。请注意，Django 模板语言不使用括号来调用方法。`{% with %}` 标记允许您为新变量赋值，该值在 `{% endwith %}` 结束之前一直可用。
+
+> `{% with %}` 模板标记可用于避免命中数据库或多次访问昂贵的方法。
+
+使用pluralize 模板筛选器可以显示单词comments 的复数后缀，具体取决于`total_comments`值。模板筛选器采用它们所应用的变量的值作为其输入，并返回计算值。我们将在第 3 章 “扩展您的博客应用进程”中讨论模板筛选器。
+
+如果值与 1 不同，则复数模板筛选器将返回一个带有字母“s”的字符串。前面的文本将呈现为 0 个注释、1 个注释或 N 个注释。Django包含大量的模板标签和过滤器，可以帮助您以所需的方式显示信息。
+
+现在，让我们包括注释列表。将以下行附加到上述代码下方的 post/detail.html模板：
+```python
+{% for comment in comments %}
+<div class="comment">
+    <p class="info">
+        Comment {{forloop.counter}} by {{comment.name}} {{comment.created}}
+    </p>
+    {{comment.body | linebreaks}}
+</div>
+{% empty %}
+    <p>There are no comments yet.</p>
+{% endfor %}
+```
+您可以使用 {% for %} 模板标记来循环查看注释。如果评论列表为空，则会显示一条默认消息，通知您的用户此帖子尚无评论。使用 {{ forloop.counter }} 变量枚举注释，该变量在每次迭代中包含循环计数器。然后，显示发布评论的用户的名称、日期和评论的正文。
+
+最后，您需要在成功提交表单时呈现表单或显示成功消息。在上面的代码正下方添加以下行：
+```html
+    <!-- comment added and New CommentForm -->
+    {% if new_comment %}
+        <h2>Your comment has been added.</h2>
+    {% else %}
+        <h2>Add a new comment</h2>
+        <form method="post">
+            {{ comment_form.as_p }}
+            {% csrf_token %}
+
+            <p><input type="submit" value="Add comment"></p>
+        </form>
+    {% endif %}
+```
+代码非常简单：如果`new_comment`对象存在，则会显示一条成功消息，因为评论已成功创建。否则，将呈现表单，其中包含每个字段的段落 <p>; 元素，并包括 POST 请求所需的 CSRF 令牌。
+
+在浏览器中打开 [http://127.0.0.1:8000/blog/](http://127.0.0.1:8000/blog/)，然后单击帖子标题以查看其详细信息页面。您将看到类似于以下屏幕截图的内容：
+
+![PostDetail Display Image]()
+
+使用表单添加一些注释。它们应按时间顺序显示在您的帖子下方，如下所示：
+
+在浏览器中打开 [http://127.0.0.1:8000/admin/blog/comment/](http://127.0.0.1:8000/admin/blog/comment/)。您将看到管理页面，其中包含您创建的注释列表。单击其中一个的名称进行编辑，取消选中“活动”复选框，然后单击“保存”按钮。您将再次被重定向到注释列表，并且“活动”列将显示注释的非活动图标。它应类似于以下屏幕截图中的第一条评论：
+
+如果您返回到帖子详细信息视图，您将注意到不再显示非活动评论;它也不计入评论总数。借助活动字段，您可以停用不适当的评论，并避免在帖子中显示它们。
 
 ## 添加标签功能
 
