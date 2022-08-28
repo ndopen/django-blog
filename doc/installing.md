@@ -1318,7 +1318,246 @@ new_comment.save()
 如果您返回到帖子详细信息视图，您将注意到不再显示非活动评论;它也不计入评论总数。借助活动字段，您可以停用不适当的评论，并避免在帖子中显示它们。
 
 ## 添加标签功能
+实施评论系统后，您需要创建一种标记帖子的方法。您将通过将第三方Django标记应用进程集成到您的项目中来做到这一点。django-taggit是一个可重用的应用进程，主要为您提供Tag模型和管理器，以轻松地向任何模型添加标签。您可以在 https://github.com/jazzband/django-taggit 查看其源代码。
+
+首先，您需要通过运行以下命令通过 pip 安装 django-taggit：
+```shell
+pip install django_taggit==1.2.0
+```
+
+然后，打开 mysite 项目的 settings.py 文档，并将 taggit 添加到INSTALLED_APPS设置中，如下所示：
+```python
+INSTALLED_APPS = [
+    ...
+    'taggit',
+]
+```
+
+打开博客应用进程的 models.py 文档，并使用以下代码将 django-taggit 提供的 TaggableManager 管理器添加到 Post 模型中：
+```python
+from taggit.managers import TaggableManager
+class Post(models.Model):
+...
+tags = TaggableManager()
+```
+标签管理器将允许您在 Post 对象中添加、检索和删除标签。
+
+运行以下命令为模型更改创建迁移：
+```shell
+python manage.py makemigrations blog
+```
+
+您应获得以下输出：
+```shell
+(venv) hairong@sihairong:~/object/django-blog$ python manage.py makemigrations blog
+Migrations for 'blog':
+  blog/migrations/0003_post_tags.py
+    - Add field tags to post
+```
+
+现在，运行以下命令为 django-taggit 模型创建所需的数据库表，并同步模型更改：
+```shell
+(venv) hairong@sihairong:~/object/django-blog$ python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, blog, contenttypes, sessions, taggit
+Running migrations:
+  Applying taggit.0001_initial... OK
+  Applying taggit.0002_auto_20150616_2121... OK
+  Applying taggit.0003_taggeditem_add_unique_index... OK
+  Applying blog.0003_post_tags... OK
+```
+
+您的数据库现在已准备好使用 django-taggit 模型。
+
+让我们来探讨一下如何使用标签管理器。使用 python manage.py shell 命令打开终端，然后输入以下代码。首先，您将检索您的一个帖子：
+```shell
+>>> from blog.models import post
+>>> post = Post.published.get(pk=3)
+```
+然后，向其添加一些标签并检索其标签以检查它们是否已成功添加：
+```shell
+>>> post.tags.add('music', 'django', 'tags')
+>>> post.tags.all()
+<QuerySet [<Tag: django>, <Tag: music>, <Tag: tags>]>
+```
+
+最后，删除标签并再次检查标签列表：
+```shell
+>>> post.tags.remove('django')
+>>> post.tags.all()
+<QuerySet [<Tag: music>, <Tag: tags>]>
+```
+
+这很容易，对吧？运行 python manage.py runserver 命令以再次启动开发服务器，并在浏览器中打开 http://127.0.0.1:8000/admin/taggit/tag/
+
+您将看到管理页面，其中包含 taggit 应用进程的 Tag 对象列表：
+
+![Tags admin Images]()
+
+导航到 [http://127.0.0.1:8000/admin/blog/post/](http://127.0.0.1:8000/admin/blog/post/)，然后单击帖子进行编辑。您将看到帖子现在包含一个新的 Tags 字段，您可以在其中轻松编辑标签;
+
+现在，您需要编辑博客文章以显示标签。打开博客/帖子/列表。 html 模板，并在帖子标题下方添加以下 HTML 代码：
+```html
+<p class="tags">Tags: {{ posts.tags.all | join:", " }}</p>
+```
+
+联接模板筛选器的工作方式与 Python 字符串 join（） 方法相同，用于将元素与给定字符串连接起来。在浏览器中打开 [http://127.0.0.1:8000/blog/](http://127.0.0.1:8000/blog/)。您应该能够在每个帖子标题下看到标签列表：
+
+![detail post for tags display image]()
+
+接下来，您将编辑post_list视图，以允许用户列出使用特定标记标记的所有帖子。打开博客应用进程的 views.py 文档，导入 django-taggit 中的 Tag 模型，然后更改post_list视图以选择性地按标记筛选帖子，如下所示：
+```python
+from taggit.models import Tag
+
+def post_list(request, tag_slug=None):
+    '''post list 视图方法 返回已发布所有posts'''
+    object_list = Post.published.all()
+    tag=None
+
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug = tag_slug)
+        object_list = object_list.filter(tags__in=[tag])
+
+    paginator = Paginator(object_list, 3)
+    page = request.GET.get('page')
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        # 如果页面不是整数，则传递第一页
+        posts = paginator.page(1)
+    except EmptyPage:
+        # 如果页面超出范围，则提供最后一页的结果
+        posts = paginator.page(paginator.num_pages)
+
+
+    return render(request, 'blog/post/list.html', {'posts' : posts, 'page':page})
+```
+
+post_list视图现在的工作方式如下：
+
+1. 它采用具有 `None` 默认值的可选 `tag_slug` 参数。 此参数将在 URL 中传递。
+2. 在视图中，生成初始 QuerySet，检索所有已发布的帖子，如果存在给定的标记辅助信息区，则使用 get_object_or_404（） 快捷方式获取具有给定辅助信息组的 Tag 对象。
+3. 然后，按包含给定标记的帖子列表筛选帖子列表。 由于这是一种多对多关系，因此您必须按给定列表中包含的标签过滤帖子，在您的情况下，该列表仅包含一个元素。您可以使用__in字段查找。当一个模型的多个对象与另一个模型的多个对象相关联时，就会发生多对多关系。在您的应用进程中，一个帖子可以有多个标签，一个标签可以与多个帖子相关。您将在第 5 章 “在您的网站上共享内容”中学习如何创建多对多关系。您可以在 https://docs.djangoproject.com/en/4.0/topics/db/examples/many_to_many/ 发现更多关于多对多关系的信息。
+
+请记住，查询集是懒惰的。只有在呈现模板时循环访问帖子列表时，才会计算用于检索帖子的 QuerySet。
+
+最后，修改视图底部的 render（） 函数，将标记变量传递给模板。视图应如下所示：
+```python
+return render(request, 'blog/post/list.html', {'posts' : posts, 'page':page, 'tag':tag})
+```
+打开博客应用进程的 urls.py 文档，注释掉基于类的 PostListView URL 模式，然后取消注释post_list视图，如下所示：
+```python
+urlpatterns = [
+    # post urls
+    # path('', views.PostListView.as_view(), name='post_list'),
+    path('', views.post_list, name='post_list'),
+    ...
+```
+
+添加以下附加 URL 模式以按标记列出帖子：
+```python
+urlpatterns = [
+    ...
+    path('tag/<slug:tag_slug>/', views.post_list, name='post_list_by_tag')
+]
+```
+
+如您所见，这两种模式都指向同一视图，但命名方式不同。第一个模式将调用post_list视图而不带任何可选参数，而第二个模式将使用 tag_slug 参数调用视图。您可以使用数据域路径转换器将参数匹配为小写字符串，其中包含 ASCII 字母或数字，以及连字符和下划线字符。
+
+由于您使用的是post_list视图，因此请编辑 blog/post/list.html 模板并修改分页以使用 posts 对象：
+```html
+{% include 'blog/pagination.html' with page=posts %}
+```
+
+在 {% for %} 循环上方添加以下行：
+```html
+{% if tag %}
+    <h2>Posts tagged with "{{ tag.name }}"</h2>
+{% endif %}
+```
+
+如果用户正在访问博客，他们将看到所有帖子的列表。如果他们按标记了特定标记的帖子进行筛选，他们将看到要筛选的标记。
+
+现在，更改标签的显示方式，如下所示：
+```python
+<p class="tags">
+    Tags:
+    {% for tag in post.tags.all %}
+    <a href="{% url "blog:post_list_by_tag" tag.slug %}">
+    {{ tag.name }}
+    </a>
+    {% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+```
+
+在上面的代码中，您可以遍历帖子的所有标签，这些标签显示指向该 URL 的自定义链接，以按该标签过滤帖子。使用 `{% url "blog：post_ list_by_tag" tag.slug %} `构建 URL，并使用 URL 的名称和 slug 标记作为其参数。用逗号分隔标记。
+
+在浏览器中打开 [http://127.0.0.1:8000/blog/](http://127.0.0.1:8000/blog/)，然后单击任何标签链接。 您将看到按该标记过滤的帖子列表，如下所示：
+
+![tag slug in post list images]()
 
 ## 按相似性检索帖子
+现在，您已经为博客文章实施了标记，您可以使用标记执行许多有趣的操作。标签允许您以非分层方式对帖子进行分类。有关类似主题的帖子将有几个共同的标签。您将构建一个功能，以按它们共享的标签数量显示类似的帖子。通过这种方式，当用户阅读帖子时，您可以建议他们阅读其他相关帖子。
+
+为了检索特定帖子的类似帖子，您需要执行以下步骤：
+1. 检索当前帖子的所有标签
+2. 获取使用任何这些标签标记的所有帖子
+3. 从该列表中排除当前帖子，以避免推荐相同的帖子
+4. 按与当前帖子共享的标签数量对结果进行排序
+5. 如果两个或多个帖子的标签数量相同，请推荐最新的帖子
+6. 将查询限制为要推荐的帖子数
+
+这些步骤将转换为复杂的查询集，您将其包含在post_detail视图中。将博客应用进程的 views.py 文档换行，并在其顶部添加以下导入：
+```python
+from django.db.models import Count
+```
+这是Django ORM的计数聚合函数。此功能将允许您执行标签的聚合计数。django.db.models 包括以下聚合函数：
+- Avg : 平均值
+- Max : 最大值
+- Min : 最小值
+- Count : 对象总数
+
+您可以在 [https://docs.djangoproject.com/en/4.0/topics/db/aggregation/](https://docs.djangoproject.com/en/4.0/topics/db/aggregation/)中了解聚合。
+
+在post_detail视图中的 render（） 函数之前添加以下行，具有相同的缩进级别：
+```python
+post_tags_ids = Post.tags.values_list('id', flat = True)
+similar_posts = Post.published.filter(tags__in = post_tags_ids).exclude(id=posts.id)
+similar_posts = similar_posts.annotate(same_tags =  Count('tags')).order_by('-same_tags', '-publish')[:2]
+```
+上述代码如下：
+1. 检索当前帖子的标签的 Python ID 列表。values_ list（） QuerySet 返回包含给定字段值的元组。将 flat=True 传递给它以获取单个值[1, 2, 3, ...]，而不是一元组[(1,), (2,), (3,) ...]。
+2. 您将获得包含任何这些标签的所有帖子，但不包括当前帖子本身。
+3. 使用 Count 聚合函数生成一个计算字段（same_tags），其中包含与查询的所有标记共享的标记数。
+4. 您可以按共享标记的数量（降序）对结果进行排序，然后按发布来首先显示具有相同数量共享标记的帖子的最近帖子。对结果进行切片以仅检索前四个帖子。
+
+将 similar_posts 对象添加到 render（） 函数的上下文本典中，如下所示：
+```python
+    return render(request, 'blog/post/detail.html', {'posts' : posts, 'comments':comments, 'new_comment': new_comment, 'comment_form': comment_form, 'similar_posts': similar_posts})
+```
+
+现在，编辑 blog/post/detail.html 模板，并在评论列表之前添加以下代码：
+```html
+<h2>Similar posts</h2>
+{% for post in similar_posts %}
+    <p>
+        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+    </p>
+{% empty %}
+    There are no similar posts yet.
+{% endfor %}
+```
+
+帖子详情页面应如下所示：
+
+![detail similar posts image]()
+
+现在，您可以成功地向用户推荐类似的帖子。django-taggit还包括一个similar_objects（）管理器，您可以使用它来通过共享标签检索对象。你可以查看所有django-taggit https://django-taggit.readthedocs.io/en/latest/api.html.
+
+您还可以将标签列表添加到帖子详细信息模板，方法与在 blog/post/list.html 模板中相同。
 
 ## 摘要
+在本章中，您学习了如何使用 Django 表单和模型表单。 您创建了一个系统来通过电子邮件共享您网站的内容，并为您的博客创建了一个评论系统。您在博客文章中添加了标记，集成了可重用的应用进程，并构建了复杂的 QuerySet 以按相似性检索对象。
+
+在下一章中，您将学习如何创建自定义模板标签和过滤器。 您还将为博客文章构建自定义站点地图和源，并为您的帖子实现全文搜索功能。

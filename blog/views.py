@@ -3,13 +3,22 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
 from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
+from django.db.models import Count
+
 
 from .models import Post, Comment
+from taggit.models import Tag
 
 # Create your views here.
-def post_list(request):
+def post_list(request, tag_slug=None):
     '''post list 视图方法 返回已发布所有posts'''
     object_list = Post.published.all()
+    tag=None
+
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug = tag_slug)
+        object_list = object_list.filter(tags__in=[tag])
+
     paginator = Paginator(object_list, 3)
     page = request.GET.get('page')
     try:
@@ -22,7 +31,7 @@ def post_list(request):
         posts = paginator.page(paginator.num_pages)
 
 
-    return render(request, 'blog/post/list.html', {'posts' : posts, 'page':page})
+    return render(request, 'blog/post/list.html', {'posts' : posts, 'page':page, 'tag':tag})
 
 class PostListView(ListView):
     queryset = Post.published.all()
@@ -33,6 +42,12 @@ class PostListView(ListView):
 def post_detail(request, post, year, month, day):
     '''post detail 视图，返回请求条件相符合的Post'''
     posts = get_object_or_404(Post, slug = post, status='published', publish__year=year, publish__month=month, publish__day=day)
+
+    post_tags_ids = Post.tags.values_list('id', flat = True)
+    similar_posts = Post.published.filter(tags__in = post_tags_ids).exclude(id=posts.id)
+    similar_posts = similar_posts.annotate(same_tags =  Count('tags')).order_by('-same_tags', '-publish')[:2]
+
+
 
     # list of active comment for the this post
     comments = posts.comments.filter(active = True)
@@ -51,7 +66,7 @@ def post_detail(request, post, year, month, day):
     else:
         comment_form = CommentForm()
 
-    return render(request, 'blog/post/detail.html', {'posts' : posts, 'comments':comments, 'new_comment': new_comment, 'comment_form': comment_form})
+    return render(request, 'blog/post/detail.html', {'posts' : posts, 'comments':comments, 'new_comment': new_comment, 'comment_form': comment_form, 'similar_posts': similar_posts})
 
 def post_share(request, post_id):
     '''post in email share'''
