@@ -1561,3 +1561,171 @@ similar_posts = similar_posts.annotate(same_tags =  Count('tags')).order_by('-sa
 在本章中，您学习了如何使用 Django 表单和模型表单。 您创建了一个系统来通过电子邮件共享您网站的内容，并为您的博客创建了一个评论系统。您在博客文章中添加了标记，集成了可重用的应用进程，并构建了复杂的 QuerySet 以按相似性检索对象。
 
 在下一章中，您将学习如何创建自定义模板标签和过滤器。 您还将为博客文章构建自定义站点地图和源，并为您的帖子实现全文搜索功能。
+
+# 扩展您的博客应用进程
+上一章介绍了表单的基础知识和评论系统的创建。您还学习了如何使用Django发送电子邮件，并通过将第三方应用进程与您的项目集成来实现标记系统。在本章中，您将使用博客平台上使用的其他一些流行功能扩展您的博客应用进程。您还将了解Django的其他组件和功能。
+
+本章将涵盖以下几点：
+
+- 创建自定义模板标签和过滤器：您将学习如何构建自己的模板标签和模板过滤器，以利用Django模板的功能。
+- 添加站点地图和帖子源：您将学习如何使用Django附带的站点地图框架和联合框架。
+- 使用PostgreSQL实现全文搜索：搜索是博客中非常受欢迎的功能。您将学习如何为您的博客应用进程实现高级搜索引擎。
+
+## 1. 创建自定义模板标签和过滤器
+Django提供了各种内置的模板标签，例如{%if %}或{%block %}。 您在第 1 章 “构建博客应用进程”和第 2 章 “使用高级功能增强博客”中使用了不同的模板标记。您可以在 [https://docs.djangoproject.com/en/4.0/ref/templates/builtins/](https://docs.djangoproject.com/en/4.0/ref/templates/builtins/) 上找到内置模板标签和过滤器的完整参考。
+
+Django还允许您创建自己的模板标签来执行自定义操作。 当您需要向模板添加 Django 模板标签核心集未涵盖的功能时，自定义模板标签会非常方便。这可以是用于执行查询集的标记，也可以是要跨模板重用的任何服务器端处理的标记。例如，您可以构建一个模板标记来显示博客上发布的最新帖子的列表。您可以在多个页面的博客边栏中包含此列表，而不管视图如何。
+
+### 1.1 自定义模板标签
+Django提供了以下帮助进程函数，允许您以简单的方式创建自己的模板标签：
+- simple_tag : 处理数据并返回字符串
+- inclusion_tag : 处理数据并返回呈现的模板
+
+模板标签必须位于 Django 应用进程中。
+
+在博客应用进程目录中，创建一个新目录，将其命名为`templatetags`，然后向其添加一个空__init__.py文档。在同一文档夹中创建另一个文档，并将其命名为blog_tags.py。博客应用进程的文档结构应如下所示：
++ blog/
+    + templatetags/
+        - `__init__.py`
+        - `blog_tags.py`
+
+命名文档的方式很重要。您将使用此模块的名称在模板中加载标签。
+
+让我们首先创建一个简单的标签来检索博客上发布的帖子总数。 编辑刚创建的blog_tags.py文档，然后添加以下代码：
+```python
+from django import template
+from ..models import Post
+
+register = template.Library
+
+@register.simple_tag
+def total_post():
+    return Post.published.count()
+```
+
+您已经创建了一个简单的模板标记，该标记返回到目前为止发布的帖子数。每个包含模板标记的模块都需要定义一个名为 register 的变量，使其成为有效的标记库。此变量是模板的实例。库，它用于注册您自己的模板标记和筛选器。
+
+在上面的代码中，使用 Python 函数定义一个名为 `total_posts` 的标记，并使用 `@register.simple_tag` 装饰器将该函数注册为简单标记。 Django将使用函数的名称作为标签名称。如果要使用其他名称注册它，可以通过指定 name 属性（如 @register）来执行此操作。 `simple_tag（name='my_tag'）`。
+
+添加新的模板标签模块后，您需要重新启动Django开发服务器才能在模板中使用新的标签和过滤器。
+
+在使用自定义模板标记之前，必须使用 {% load %} 标记使它们可用于模板。如前所述，您需要使用包含模板标签和过滤器的Python模块的名称。
+
+打开 blog/templates/base.html 模板并在其顶部添加 {% load blog_tags %} 以加载您的模板标签模块。然后，使用您创建的标签来显示您的帖子总数。只需将 {% total_posts %} 添加到您的模板。模板应如下所示：
+```html
+{% load static %}
+{% load blog_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+</head>
+<body>
+    <div id='content'>
+        {% block content %}
+        {% endblock  %}
+    </div>
+
+    <div id='sidebar'> 
+        <h2>My Blog</h2>
+        <p>
+            this is my blog. I've written {% total_posts %} posts so fat.
+        </p>
+    </div>
+</body>
+</html>
+```
+
+您需要重新启动服务器以跟踪添加到项目的新文档。 使用 Ctrl + C 停止开发服务器，然后使用以下命令再次运行它：
+```shell
+python manage.py sehll
+```
+
+在浏览器中打开 [http://127.0.0.1:8000/blog/](http://127.0.0.1:8000/blog/)。您应该会在网站的侧边栏中看到帖子总数，如下所示：
+
+![Blog Tags Templatetags Imag]()
+
+自定义模板标签的强大之处在于，您可以处理任何数据并将其添加到任何模板中，而不管执行的视图如何。您可以执行 QuerySets 或处理任何数据以在模板中显示结果。
+
+现在，您将创建另一个标签，以在博客的侧边栏中显示最新帖子。这一次，您将使用Inclusion_tags。使用包含标记，可以使用模板标记返回的上下文变量呈现模板。
+
+编辑blog_tags.py文档并添加以下代码：
+
+```python
+@register.inclusion_tag('blog/post/latest')
+def show_latest_post(count = 5):
+    '''Latest Posts Templates'''
+    latest_posts = Post.published.order_by('-publish')[:count]
+    return {'latest_posts' : latest_posts}
+```
+在上面的代码中，使用 `@register.inclusion_ tag()` 注册模板标记，并使用 `blog/post/latest_posts.html`指定将使用返回值呈现的模板。您的模板标签将接受默认为 5 的可选计数参数。此参数用于指定要显示的帖子数。您可以使用`count`变量限制帖子数量 `published.order_by（'-publish'）[：count]`.
+
+请注意，该函数返回变量字典，而不是简单值。 包含标记必须返回值字典，该字典用作呈现指定模板的上下文。您刚刚创建的模板标签允许您指定要显示为 {% show_latest_posts 3 %} 的可选帖子数。
+
+现在，在 `blog/post/` 下创建一个新模板文件并将其命名为 `latest_posts.html`。将以下代码添加到它
+```python
+<ul>
+    {% for posts in latest_posts %}
+        <li>
+            <a href="{{ posts.get_absolute_url }}">{{ posts.title }}</a>
+        </li>
+    {% endfor %}
+</ul>
+```
+
+在上面的代码中，使用模板标记返回的 latest_ posts 变量显示帖子的无序列表。现在，编辑 blog/base.html 模板并添加新的模板标记以显示最后三篇文章。边栏代码应如下所示：
+```html
+<h3>Show Latest Post</h3>
+{% show_latest_post 3 %}
+```
+调用模板标签，传递要显示的帖子数量，并在给定上下文的适当位置呈现模板。
+
+接下来，返回浏览器并刷新页面。侧边栏现在应该如下所示：
+![Latest Posts Template Images]()
+
+最后，您将创建一个返回值的简单模板标记。您将结果存储在可重用的变量中，而不是直接输出它。您将创建一个标签来显示评论最多的帖子。
+
+编辑 `blog_tags.py` 文档并向其中添加以下导入和模板标签：
+```python
+from django.db.models import Count
+
+@register.simple_tag
+def get_most_commented_posts(count = 5):
+    '''Most Commented Posts templatetags'''
+    return Post.published.annotate(total_comments = Count('comments')).order_by('-total_comments')[:count]
+```
+在前面的模板标记中，您可以使用 `annotate（）` 函数构建一个 `QuerySet`，以聚合每个帖子的评论总数。使用 `Count` 聚合函数可以存储计算字段中的注释数total Post 对象的注释数。按计算字段降序对查询集进行排序。您还提供了一个可选的 count 变量来限制返回的对象总数。
+
+除了 `Count`，Django 还提供聚合函数 `Avg`、`Max`、`Min` 和 `Sum`。您可以在 [https://docs.djangoproject.com/en/4.0/topics/db/aggregation/](https://docs.djangoproject.com/en/4.0/topics/db/aggregation/) 阅读有关聚合函数的更多信息。
+
+接下来，编辑 blog/base.html 模板并将以下代码附加到侧边栏 `</div>` 元素：
+```python
+<h3>Most Commented Posts</h3>
+{% get_most_commented_posts as most_commented_posts %}
+<ul>
+    {% for posts in most_commented_posts %}
+    <li>
+        <a href="{{ posts.get_absolute_url }}">{{ posts.title }}</a>
+    </li>
+    {% endfor %}
+</ul>
+```
+
+在前面的代码中，您使用 as 参数后跟变量名称将结果存储在自定义变量中。对于您的模板标签，您使用 `{% get_ most_commented_posts as most_commented_posts %}` 将模板标签的结果存储在名为 `most_commented_posts` 的新变量中。然后，您使用无串行表显示返回的帖子。
+
+现在打开浏览器并刷新页面以查看最终结果。它应该如下所示：
+![Most Commented Posts Template Images]()
+
+现在，您已经清楚地了解如何构建自定义模板标记。您可以在 [https://docs.djangoproject.com/en/4.0/howto/custom-template-tags/](https://docs.djangoproject.com/en/4.0/howto/custom-template-tags/) 中阅读有关它们的更多信息。
+
+### 1.2 自定义模板过滤器
+
+## 向网站添加站点地图
+
+## 创建Blog Post 订阅**RRS**
+
+## 向博客添加全文搜索
+
+## 摘要
