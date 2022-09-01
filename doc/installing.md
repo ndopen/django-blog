@@ -1721,6 +1721,56 @@ def get_most_commented_posts(count = 5):
 现在，您已经清楚地了解如何构建自定义模板标记。您可以在 [https://docs.djangoproject.com/en/4.0/howto/custom-template-tags/](https://docs.djangoproject.com/en/4.0/howto/custom-template-tags/) 中阅读有关它们的更多信息。
 
 ### 1.2 自定义模板过滤器
+Django 有各种内置的模板过滤器，允许您更改模板中的变量。这些是 Python 函数，它们接受一个或两个参数、应用过滤器的变量的值和一个可选参数。它们返回一个可以被另一个过滤器显示或处理的值。过滤器看起来像 {{ variable|my_filter }}。带有参数的过滤器看起来像 `{{ variable|my_ filter:"foo" }}`。例如，您可以使用 `capfirst` 过滤器将值的第一个字符大写，例如 `{{ value|capfirst }}`。如果值为`django`，则输出将为`Django`。您可以对变量应用任意数量的过滤器，例如 `{{ variable|filter1|filter2 }}`，它们中的每一个都将应用于由前面的过滤器生成的输出。
+
+您可以在 [https://docs.djangoproject.com/en/4.0/ref/templates/builtins/#built-in-filter-reference](https://docs.djangoproject.com/en/4.0/ref/templates/builtins/#built-in-filter-reference) 找到 Django 的内置模板过滤器列表。 
+
+您将创建自定义筛选器，以便能够在博客文章中使用 markdown 语法，然后将文章内容转换为模板中的 HTML。Markdown是一种纯文本格式语法，使用起来非常简单，旨在将其转换为HTML。您可以使用简单的 markdown 语法撰写帖子，并将内容自动转换为 HTML 代码。学习 markdown 语法比学习 HTML 容易得多。通过使用markdown，您可以让其他非技术娴熟的贡献者轻松为您的博客撰写帖子。您可以在 https://daringfireball.net/projects/markdown/basics 学习降价格式的基础知识。
+
+首先，使用以下命令通过 pip 安装 Python markdown 模块：
+```shell
+pip install markdown==3.2.1
+```
+
+然后，编辑 blog_tags.py 文档并包含以下代码：
+```python
+import markdown
+from django.utils.safestring import mark_safe
+
+@register.filter(name='markdown')
+def markdown_format(text):
+    return mark_safe(markdown.markdown(text))
+```
+您注册模板过滤器的方式与模板标签相同。为了防止您的函数名称和 markdown 模块之间的名称冲突，您将函数命名为 `markdown_format` 并将过滤器命名为 `markdown` 以在模板中使用，例如 `{{ variable|markdown }}`。 Django 对过滤器生成的 HTML 代码进行转义； HTML 实体的字符被替换为它们的 HTML 编码字符。例如，`<p>`; 转换为 `&lt ;p &gt` （小于符号，p 字符，大于符号）。您使用 Django 提供的 `mark_safe` 函数将结果标记为要在模板中呈现的安全 HTML。默认情况下，Django 不会信任任何 HTML 代码，并且会在将其放入输出之前对其进行转义。唯一的例外是被标记为安全的变量。此行为可防止 Django 输出具有潜在危险的 HTML，并允许您创建异常以返回安全的 HTML。
+
+现在，在帖子列表和详细信息模板中加载您的模板标签模块。在 `{% extends %}` 标记后的 `blog/post/list.html` 和 `blog/post/detail.html` 模板的顶部添加以下行：
+```python
+{% load blog_tags %}
+```
+在 `post/detail.html` 模板中，查找以下行：
+
+```python
+{{posts.body | linebreaks}}
+```
+将其替换为以下内容：
+```python
+{{posts.body | markdown}}
+```
+然后，在 `post/list.html` 模板中，找到以下行：
+```python
+{{post.body | truncatewords:30 | linebreaks}}
+```
+将其替换为以下一个：
+```python
+{{post.body | markdown | truncatewords_html:30}}
+```
+truncatewords_html筛选器在一定数量的单词后截断字符串，避免未关闭的 HTML 标记
+
+打开浏览器，查看帖子的呈现方式。您应看到以下输出：
+![markdown output Images]()
+
+正如您在前面的屏幕截图中所见，自定义模板过滤器对于自定义格式非常有用。您可以在 https://docs.djangoproject.com/en/4.0/howto/custom-template-tags/#writing-custom-template-filters 找到有关自定义过滤器的更多信息。
+
 
 ## 向网站添加站点地图
 
