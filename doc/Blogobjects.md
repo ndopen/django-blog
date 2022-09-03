@@ -1869,7 +1869,67 @@ urlpatterns = [
 现在，Feed 中显示的 URL 将使用此主机名构建。在生产环境中，您必须为站点的框架使用自己的域名。
 
 ## 创建Blog Post 订阅**RRS**
+Django 有一个内置的`feed聚合`框架，您可以使用它以类似于使用站点框架创建站点地图的方式动态生成 `RSS` 或 `Atom feed`。 Web feed是一种数据格式（通常是 XML），它为用户提供最近更新的内容。用户将能够使用`feed 聚合器`（用于读取提要和获取新内容通知的软件）订阅您的提要。
+
+在您的博客应用目录中创建一个新文档并将其命名为 `feeds.py`。向其中添加以下行：
+```python
+from django.contrib.syndication.views import Feed
+from django.template.defaultfilters import truncatewords
+from django.urls import reverse_lazy
+from .models import Post
+
+class LatestPostsFeed(Feed):
+    '''publishdPost Feed'''
+    title = 'my blog'
+    link = reverse_lazy('blog:post_list')
+    description = 'New posts of My Blog'
+
+    def items(self):
+        return Post.published.all()[:5]
+
+    def item_title(self, item):
+        return item.title
+
+    def item_description(self, item):
+        return truncatewords(item.body, 30)
+```
+首先，将 syndication 框架的 Feed 类子类化。标题、链接和描述属性对应于<title>、<link>和<description>
+
+您可以使用 `reverse_lazy（）` 为链接属性生成 URL。`reverse（）` 方法允许您按名称构建 URL 并传递可选参数。 您在第 1 章 “构建博客应用进程”中使用了 reverse（）。reverse_lazy（） 实用进程函数是反向（） 的延迟评估版本。它允许您在加载项目的 URL 配置之前使用 URL 反转。
+
+`items()` 方法检索要包含在feed 中的对象。您只检索此提要的最后五个发布的帖子。 item_title() 和 item_description() 方法将接收 items() 返回的每个对象，并返回每个项目的标题和描述。您使用 truncatewords 内置模板过滤器来构建博客文章的前 30 个单词的描述。
+
+现在编辑 blog/urls.py 文档，导入您刚刚创建的 LatestPostsFeed，并以新的 URL 模式实例化Feed：
+```python
+from django.urls import path
+from . import views
+from .feeds import LatestPostsFeed
+
+app_name = 'blog'
+
+urlpatterns = [
+    path('feeds/', LatestPostsFeed(), name='post_feed')
+]
+```
+导航到浏览器中的 http://127.0.0.1:8000/blog/feed/。您现在应该看到 RSS 源，包括最后五篇博客文章：
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>my blog</title><link>http://localhost:8000/blog/</link><description>New posts of My Blog</description><atom:link href="http://localhost:8000/blog/feeds/" rel="self"></atom:link><language>en-us</language><lastBuildDate>Sat, 03 Sep 2022 15:35:54 +0000</lastBuildDate><item><title>Field options</title><link>http://localhost:8000/blog/2022/8/20/fieldoptions/</link><description>The following arguments are available to all field types. All are optional. ![](https://daringfireball.net/graphics/logos/) null¶ Field.null¶ If True, Django will store empty values as NULL in the database. Default is False. …</description><guid>http://localhost:8000/blog/2022/8/20/fieldoptions/</guid></item><item><title>choices</title><link>http://localhost:8000/blog/2022/8/20/choices/</link><description>Field.choices¶ A sequence consisting itself of iterables of exactly two items (e.g. [(A, B), (A, B) ...]) to use as choices for this field. If choices are given, they’re enforced …</description><guid>http://localhost:8000/blog/2022/8/20/choices/</guid></item><item><title>New Title</title><link>http://localhost:8000/blog/2022/8/20/shellblog/</link><description>post body</description><guid>http://localhost:8000/blog/2022/8/20/shellblog/</guid></item><item><title>create function</title><link>http://localhost:8000/blog/2022/8/20/function/</link><description>used django Api createFunction</description><guid>http://localhost:8000/blog/2022/8/20/function/</guid></item><item><title>markdownActive</title><link>http://localhost:8000/blog/2022/9/1/markdownactive/</link><description>This is a post formatted with markdown -------------------------------------- *This is emphasized* and **this is more emphasized**. Here is a list: - one - Two - Three - Candy. - Gum. …</description><guid>http://localhost:8000/blog/2022/9/1/markdownactive/</guid></item></channel></rss>
+```
+如果您在RSS客户端中打开相同的URL，您将能够通过用户友好的界面查看您的feed。
+
+最后一步是将订阅源订阅链接添加到博客的侧边栏。打开 blog/base.html 模板并在侧边栏 div 内的总帖子数下添加以下行：
+```python
+<p>
+    <a href="{% url 'blog:post_feed' %}">Subscribe to my RSS feed</a>
+</p>
+```
+现在，在浏览器中打开 [http://127.0.0.1:8000/blog/](http://127.0.0.1:8000/blog/)，然后查看侧边栏。新链接应将您带到博客的源：
+![feed RRS Images]()
+
+您可以在 [https://docs.djangoproject.com/en/4.0/ref/contrib/syndication/](https://docs.djangoproject.com/en/4.0/ref/contrib/syndication/) 阅读有关 Django 联合提要框架的更多信息。
 
 ## 向博客添加全文搜索
+
 
 ## 摘要
