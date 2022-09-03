@@ -17,7 +17,7 @@ Python 3.10.5
 
 如果您安装的 Python 版本低于 3.6，或者您的计算机上没有安装 Python，请从 https://www.python.org/downloads/ 下载 Python 3.8.2 并安装它。
 
-由于您将使用Python 3，因此您不必安装数据库。这个Python版本带有一个内置的SQLite数据库。SQLite是一个轻量级数据库，你可以与Django一起开发。如果计划在生产环境中部署应用进程，则应使用功能齐全的数据库，如 PostgreSQL、MySQL 或 Oracle。你可以在 https://docs.djangoproject.com/ en/3.0/topics/install/#database-install找到更多关于如何使用 Django 运行数据库的信息。
+由于您将使用Python 3，因此您不必安装数据库。这个Python版本带有一个内置的SQLite数据库。SQLite是一个轻量级数据库，你可以与Django一起开发。如果计划在生产环境中部署应用，则应使用功能齐全的数据库，如 PostgreSQL、MySQL 或 Oracle。你可以在 https://docs.djangoproject.com/ en/3.0/topics/install/#database-install找到更多关于如何使用 Django 运行数据库的信息。
 
 
 ### 1.1 创建一个隔离的 Python 环境
@@ -74,14 +74,14 @@ django-admin startproject mysite .
 
 - mysite/：这是您的项目目录，由以下文档组成：
     - __init__.py：一个空文档，告诉 Python 将 mysite 目录视为 Python 模块。
-    - asgi.py：这是将项目作为 ASGI 运行的配置，ASGI 是用于异步 Web 服务器和应用进程的新兴 Python 标准。
+    - asgi.py：这是将项目作为 ASGI 运行的配置，ASGI 是用于异步 Web 服务器和应用的新兴 Python 标准。
     - settings.py：这表明您的项目的设置和配置，并包含初始默认设置。
     - urls.py：这是您的 URL 所在的地方。此处定义的每个 URL 都映射到一个视图。
-    - wsgi.py：这是将项目作为 Web 服务器网关接口 （WSGI） 应用进程运行的配置。
+    - wsgi.py：这是将项目作为 Web 服务器网关接口 （WSGI） 应用运行的配置。
 
-生成的 settings.py 文档包含项目设置，包括使用 SQLite3 数据库的基本配置和名为 INSTALLED_APPS 的列表，其中包含默认情况下添加到项目中的常见 Django 应用进程。 稍后我们将在“项目设置”部分中介绍这些应用进程。
+生成的 settings.py 文档包含项目设置，包括使用 SQLite3 数据库的基本配置和名为 INSTALLED_APPS 的列表，其中包含默认情况下添加到项目中的常见 Django 应用。 稍后我们将在“项目设置”部分中介绍这些应用。
 
-Django 应用进程包含一个 models.py 文档，其中定义了数据模型。每个数据模型都映射到一个数据库表。要完成项目设置，您需要创建与 INSTALLED_APPS 中列出的应用进程模型关联的表。 Django 包含一个管理这个的迁移系统。
+Django 应用包含一个 models.py 文档，其中定义了数据模型。每个数据模型都映射到一个数据库表。要完成项目设置，您需要创建与 INSTALLED_APPS 中列出的应用模型关联的表。 Django 包含一个管理这个的迁移系统。
 
 打开 shell 并运行以下命令：
 ```shell
@@ -108,7 +108,7 @@ Running migrations:
   Applying sessions.0001_initial... OK
 ```
 
-前面几行是 Django 应用的数据库迁移。通过应用迁移，初始应用进程的表在数据库中创建。您将在本章的创建和应用迁移部分了解迁移管理命令。
+前面几行是 Django 应用的数据库迁移。通过应用迁移，初始应用的表在数据库中创建。您将在本章的创建和应用迁移部分了解迁移管理命令。
 
 ### 2.1 运行开发服务器
 Django附带了一个轻量级的Web服务器来快速运行你的代码，而无需花时间配置生产服务器。当你运行Django开发服务器时，它会不断检查代码中的更改。它会自动重新加载，使您无需在代码更改后手动重新加载它。但是，它可能不会注意到某些操作，例如向项目添加新文档，因此在这些情况下，您必须手动重新启动服务器。
@@ -130,7 +130,7 @@ python manage.py runserver 127.0.0.1:8001
 ```
 > 当您必须处理需要不同配置的多个环境时，您可以为每个环境创建不同的设置文档。
 
-请记住，此服务器仅用于开发，不适合生产用途。为了在生产环境中部署Django，您应该使用Web服务器（例如Apache，Gunicorn或uWSGI）将其作为WSGI应用进程运行，或者使用Uvicorn或Daphne等服务器将其作为ASGI应用进程运行。您可以在 https://docs.djangoproject.com/en/3.0/howto/deployment/wsgi/ 上找到有关如何使用不同Web服务器部署Django的更多信息。
+请记住，此服务器仅用于开发，不适合生产用途。为了在生产环境中部署Django，您应该使用Web服务器（例如Apache，Gunicorn或uWSGI）将其作为WSGI应用运行，或者使用Uvicorn或Daphne等服务器将其作为ASGI应用运行。您可以在 https://docs.djangoproject.com/en/3.0/howto/deployment/wsgi/ 上找到有关如何使用不同Web服务器部署Django的更多信息。
 
 第 14 章“上线”解释了如何为 Django 项目设置生产环境
 
@@ -138,11 +138,11 @@ python manage.py runserver 127.0.0.1:8001
 让我们打开 settings.py 文档，并查看项目的配置。 Django在此文档中包含了几个设置，但这些只是所有可用Django设置的一部分。您可以在 https://docs.djangoproject.com/en/3.0/ref/settings/ 查看所有设置及其默认值。
 
 以下设置值得一看：
-- DEBUG 是一个布尔值，用于打开和关闭项目的调试。如果设置为 True，当您的应用进程抛出未捕获的异常时，Django 将显示详细的错误页面。当您迁移到生产环境时，请记住您必须将其设置为 False。切勿在启用调试的情况下将站点部署到生产环境中，因为您将暴露与项目相关的敏感数据。
+- DEBUG 是一个布尔值，用于打开和关闭项目的调试。如果设置为 True，当您的应用抛出未捕获的异常时，Django 将显示详细的错误页面。当您迁移到生产环境时，请记住您必须将其设置为 False。切勿在启用调试的情况下将站点部署到生产环境中，因为您将暴露与项目相关的敏感数据。
 
 - ALLOWED_HOSTS 在调试打开或运行测试时不应用。将站点移动到生产环境并将 DEBUG 设置为 False 后，您必须将域/主机添加到此设置中，以允许它为您的 Django 站点提供服务。
 
-- INSTALLED_APPS是您必须为所有项目编辑的设置。此设置告诉Django哪些应用进程在此站点上处于活动状态。默认情况下，Django包括以下应用进程：
+- INSTALLED_APPS是您必须为所有项目编辑的设置。此设置告诉Django哪些应用在此站点上处于活动状态。默认情况下，Django包括以下应用：
     + django.contrib.admin：一个管理站点
     + django.contrib.auth： 默认认证系统
     + django.contrib.contenttypes：处理内容类型的框架
@@ -152,7 +152,7 @@ python manage.py runserver 127.0.0.1:8001
 
 - MIDDLEWARE 是一个列表，其中包含要执行的中间件。
 
-- ROOT_URLCONF 表示定义应用进程的根 URL 的 Python 模块。
+- ROOT_URLCONF 表示定义应用的根 URL 的 Python 模块。
 - DATABASES 是一个字典，其中包含要在项目中使用的所有数据库的设置。必须始终存在默认数据库。默认配置使用 SQLite3 数据库。
 - LANGUAGE_CODE定义了此Django站点的默认语言代码。
 - USE_TZ 告诉 Django 激活/停用时区支持。 Django 支持时区感知日期时间。当您使用 startproject 管理命令创建新项目时，此设置设置为 True。
@@ -160,19 +160,19 @@ python manage.py runserver 127.0.0.1:8001
 如果您对在这里看到的内容不太了解，请不要担心。您将在接下来的章节中学习不同的 Django 设置。
 
 ### 2.3 项目和应用
-在本书中，您将一遍又一遍地遇到术语项目和应用进程。在Django中，一个项目被认为是具有某些设置的Django安装。 应用进程是一组模型、视图、模板和 URL。应用进程与框架交互以提供一些特定的功能，并且可以在各种项目中重用。您可以将项目视为您的网站，其中包含多个应用进程，例如博客，wiki或论坛，这些应用进程也可以由其他项目使用。
+在本书中，您将一遍又一遍地遇到术语项目和应用。在Django中，一个项目被认为是具有某些设置的Django安装。 应用是一组模型、视图、模板和 URL。应用与框架交互以提供一些特定的功能，并且可以在各种项目中重用。您可以将项目视为您的网站，其中包含多个应用，例如博客，wiki或论坛，这些应用也可以由其他项目使用。
 
 下图显示了一个 Django 项目的结构：
 
 ![](https://djangobook.com/wp-content/uploads/2022/01/structure_drawing1.png)
 
-### 2.4 创建应用进程
-现在让我们创建你的第一个Django应用进程。您将从头开始创建一个博客应用进程。从项目的根目录中，运行以下命令：
+### 2.4 创建应用
+现在让我们创建你的第一个Django应用。您将从头开始创建一个博客应用。从项目的根目录中，运行以下命令：
 ```shell
 python manage.py startapp blog
 ```
 
-这将创建应用进程的基本结构，如下所示：
+这将创建应用的基本结构，如下所示：
 + blog/
     - __init__.py
     - admin.py
@@ -185,17 +185,17 @@ python manage.py startapp blog
 
 这些文档如下所示：
 - admin.py：这是您注册模型以将它们包含在 Django 管理站点中的位置——使用此站点是可选的。
-- apps.py：这包括博客应用进程的主要配置。
-- migrations：此目录将包含您的应用进程的数据库迁移。迁移允许 Django 跟踪您的模型更改并相应地同步数据库。
-- models.py：这包括应用进程的数据模型;所有Django应用进程都需要有一个 models.py 文档，但这个文档可以留空。
-- tests.py：您可以在此处为应用进程添加测试。
-- views.py：你的应用进程的逻辑在这里；每个视图接收一个 HTTP 请求，对其进行处理，然后返回一个响应。
+- apps.py：这包括博客应用的主要配置。
+- migrations：此目录将包含您的应用的数据库迁移。迁移允许 Django 跟踪您的模型更改并相应地同步数据库。
+- models.py：这包括应用的数据模型;所有Django应用都需要有一个 models.py 文档，但这个文档可以留空。
+- tests.py：您可以在此处为应用添加测试。
+- views.py：你的应用的逻辑在这里；每个视图接收一个 HTTP 请求，对其进行处理，然后返回一个响应。
 
 
 ## 3. 设计博客数据架构
 您将通过为您的博客定义数据模型来开始设计您的博客数据。模型是一个 Python 类，它是 django.db.models.Model 的子类，其中每个属性代表一个数据库字段。 Django 将为 models.py 文档中定义的每个模型创建一个表。当你创建一个模型时，Django 会为你提供一个实用的 API 来方便地查询数据库中的对象。
 
-首先，您需要定义一个 Post models。将以下行添加到博客应用进程的 models.py 文档中：
+首先，您需要定义一个 Post models。将以下行添加到博客应用的 models.py 文档中：
 ```python
 from django.db import models
 from django.contrib.auth.models import User
@@ -262,8 +262,8 @@ Django 带有不同类型的字段，可用于定义模型。您可以在 https:
 
 __str__() 方法是对象的默认人类可读表示。 Django 会在很多地方使用它，比如管理站点。
 
-### 3.1 激活应用进程
-为了让 Django 跟踪您的应用进程并能够为其模型创建数据库表，您必须激活它。为此，请编辑 settings.py 文档并将 blog.apps.BlogConfig 添加到 INSTALLED_APPS 设置中。它应该如下所示：
+### 3.1 激活应用
+为了让 Django 跟踪您的应用并能够为其模型创建数据库表，您必须激活它。为此，请编辑 settings.py 文档并将 blog.apps.BlogConfig 添加到 INSTALLED_APPS 设置中。它应该如下所示：
 ```python
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -276,17 +276,17 @@ INSTALLED_APPS = [
 ]
 ```
 
-BlogConfig 类是应用进程配置。现在Django知道你的应用进程在这个项目中是活跃的，并且能够加载它的模型。
+BlogConfig 类是应用配置。现在Django知道你的应用在这个项目中是活跃的，并且能够加载它的模型。
 
 ### 3.2 创建和应用迁移
-既然您已经为博客文章创建了数据模型，那幺您将需要一个数据库表。 Django 带有一个迁移系统，可以跟踪对模型所做的更改，并使它们能够传播到数据库中。如前所述，migrate 命令为 INSTALLED_APPS 中列出的所有应用进程应用迁移；它将数据库与当前模型和现有迁移同步。
+既然您已经为博客文章创建了数据模型，那幺您将需要一个数据库表。 Django 带有一个迁移系统，可以跟踪对模型所做的更改，并使它们能够传播到数据库中。如前所述，migrate 命令为 INSTALLED_APPS 中列出的所有应用应用迁移；它将数据库与当前模型和现有迁移同步。
 
 首先，您需要为 Post 模型创建初始迁移。在项目的根目录中，运行以下命令：
 ```shell
 python manage.py makemigrations blog
 ```
 
-Django刚刚在博客应用进程的迁移目录中创建了0001_initial.py文档。您可以打开该文档以查看迁移的显示方式。 迁移指定对其他迁移的依赖关系，以及在数据库中执行的操作，以将其与模型更改同步。
+Django刚刚在博客应用的迁移目录中创建了0001_initial.py文档。您可以打开该文档以查看迁移的显示方式。 迁移指定对其他迁移的依赖关系，以及在数据库中执行的操作，以将其与模型更改同步。
 
 让我们看一下 Django 将在数据库中执行的 SQL 代码来为您的模型创建表。 sqlmigrate 命令获取迁移名称并返回它们的 SQL 而不执行它。运行以下命令来检查第一次迁移的 SQL 输出：
 ```shell
@@ -304,7 +304,7 @@ CREATE INDEX "blog_post_slug_b95473f2" ON "blog_post" ("slug");
 CREATE INDEX "blog_post_author_id_dd7a8485" ON "blog_post" ("author_id");
 COMMIT;
 ```
-确切的输出取决于您使用的数据库。前面的输出是为 SQLite 生成的。正如您在输出中看到的，Django 通过组合应用进程名称和模型的小写名称 (blog_post) 来生成表名称，但您也可以在模型的 Meta 类中使用db_table 属性。
+确切的输出取决于您使用的数据库。前面的输出是为 SQLite 生成的。正如您在输出中看到的，Django 通过组合应用名称和模型的小写名称 (blog_post) 来生成表名称，但您也可以在模型的 Meta 类中使用db_table 属性。
 
 Django 会自动为每个模型创建一个主键，但您也可以通过在您的模型字段之一中指定 primary_key=True 来覆盖它。默认主键是一个 id 列，它由一个自动递增的整数组成。此列对应于自动添加到模型中的 id 字段。
 
@@ -312,14 +312,14 @@ Django 会自动为每个模型创建一个主键，但您也可以通过在您�
 ```shell
 python manage.py migrate
 ```
-您刚刚为INSTALLED_APPS中列出的应用进程（包括您的博客应用进程）应用了迁移。应用迁移后，数据库将反映模型的当前状态。
+您刚刚为INSTALLED_APPS中列出的应用（包括您的博客应用）应用了迁移。应用迁移后，数据库将反映模型的当前状态。
 
 如果您编辑 models.py 文档以添加、删除或更改现有模型的字段，或者如果您添加新模型，则必须使用 makemigrations 命令创建新迁移。迁移将允许 Django 跟踪模型更改。然后，您必须使用 migrate 命令应用它，以使数据库与您的模型保持同步。
 
 ## 4. 为模型创建管理站点
 现在您已经定义了帖子模型，您将创建一个简单的管理站点来管理您的博客帖子。 Django 带有一个内置的管理界面，对于编辑内容非常有用。 Django 站点是通过读取模型元数据并提供可用于编辑内容的生产就绪界面来动态构建的。您可以开箱即用地使用它，配置您希望模型在其中显示的方式。
 
-django.contrib.admin 应用进程已包含在 INSTALLED_APPS 设置中，因此您无需添加它。
+django.contrib.admin 应用已包含在 INSTALLED_APPS 设置中，因此您无需添加它。
 
 ### 4.1 创建超级用户
 首先，您需要创建一个用户来管理管理网站。运行以下命令：
@@ -350,7 +350,7 @@ Superuser created successfully.
 您可以在前面的屏幕截图中看到的组和用户模型是位于 django.contrib.auth 中的 Django 身份验证框架的一部分。如果单击“用户”，您将看到之前创建的用户。
 
 ### 4.5将模型添加到管理站点
-让我们将博客模型添加到管理站点。编辑博客应用进程的 admin.py 文档，使其如下所示：
+让我们将博客模型添加到管理站点。编辑博客应用的 admin.py 文档，使其如下所示：
 ```python
 from django.contrib import admin
 from blog.models import Post
@@ -371,7 +371,7 @@ Django 为每种类型的字段使用不同的表单小部件。即使是复杂�
 ![](https://cloud.sihairong.net/s/jxcHMMLT4xYZ6gj/preview)
 
 ### 4.6 自定义模型的显示方式
-现在，我们将看看如何自定义管理站点。编辑您的博客应用进程的 admin.py 文档并进行更改，如下所示：
+现在，我们将看看如何自定义管理站点。编辑您的博客应用的 admin.py 文档并进行更改，如下所示：
 ```python
 @admin.register(Post)
 
@@ -530,7 +530,7 @@ QuerySet 仅在以下情况下进行评估：
 
 有两种方法可以为模型添加或自定义管理器：可以向现有管理器添加额外的管理器方法，或者通过修改管理器返回的初始 QuerySet 来创建新管理器。第一种方法为您提供 QuerySet API，如 Post.objects.my_manager（），后者为您提供 Post.my_manager.all（）。模型管理器将允许您使用Post.published.all（）检索帖子。
 
-编辑您的博客应用进程的 models.py 文档以添加自定义管理器：
+编辑您的博客应用的 models.py 文档以添加自定义管理器：
 ```python
 class PublisedManager(models.Manager):
     '''定义published 模型管理方法，返回贴文状态为发布的对象'''
@@ -566,10 +566,10 @@ Post.published.filter(title__startswith='Who')
 ## 6. 构建List和PostDetail视图
 现在，您已经了解了如何使用 ORM，接下来就可以构建博客应用的视图了。Django Views只是一个Python函数，它接收Web请求并返回Web响应。返回所需响应的所有逻辑都位于视图内部。
 
-首先，您将创建应用进程视图，然后为每个视图定义一个 URL ，最后，您将创建 HTML 模板来呈现视图生成的数据。每个视图都会渲染一个模板，将变量传递给它，并返回一个带有渲染输出的 HTTP 响应。
+首先，您将创建应用视图，然后为每个视图定义一个 URL ，最后，您将创建 HTML 模板来呈现视图生成的数据。每个视图都会渲染一个模板，将变量传递给它，并返回一个带有渲染输出的 HTTP 响应。
 
 ### 6.1 创建List和detail视图
-让我们首先创建一个视图来显示帖子列表。编辑您的博客应用进程的 views.py 文档，使其如下所示：
+让我们首先创建一个视图来显示帖子列表。编辑您的博客应用的 views.py 文档，使其如下所示：
 ```python
 from django.shortcuts import render
 from blog.models import Post
@@ -582,7 +582,7 @@ def post_list(request):
 
 您刚刚创建了您的第一个 Django 视图。 post_list 视图将`request`对象作为唯一参数。所有视图都需要此参数。在此视图中，您使用之前创建的`PostManager`检索具有已发布状态的所有帖子。
 
-最后，您使用 Django 提供的 render() 快捷方式来呈现具有给定模板的帖子列表。此函数采用请求对象、模板路径和上下文变量来呈现给定的模板。它返回一个带有渲染文本（通常是 HTML 代码）的 HttpResponse 对象。 render() 快捷方式将请求上下文考虑在内，因此模板上下文处理器设置的任何变量都可以由给定模板访问。模板上下文处理器只是将变量设置到上下文中的可调用对象。您将在第 3 章，扩展您的博客应用进程中学习如何使用它们。
+最后，您使用 Django 提供的 render() 快捷方式来呈现具有给定模板的帖子列表。此函数采用请求对象、模板路径和上下文变量来呈现给定的模板。它返回一个带有渲染文本（通常是 HTML 代码）的 HttpResponse 对象。 render() 快捷方式将请求上下文考虑在内，因此模板上下文处理器设置的任何变量都可以由给定模板访问。模板上下文处理器只是将变量设置到上下文中的可调用对象。您将在第 3 章，扩展您的博客应用中学习如何使用它们。
 
 让我们创建第二个视图来显示单个帖子。将以下函数添加到 views.py 文档中：
 ```python
@@ -598,7 +598,7 @@ def post_detail(request, post, year, month, day):
 ### 6.2 为您的视图添加 URL
 URL 允许您将 URL 映射到视图。URL 由字符串、视图和允许您在项目范围内命名 URL 的名称（可选）组成。Django贯穿每个URL，并在与请求的URL匹配的第一个处停止。然后，Django 导入匹配的 URL 的视图并执行它，传递 HttpRequest 类的实例和关键字或位置参数。
 
-在博客应用进程的目录中创建一个 urls.py 文档，并在其中添加以下行：
+在博客应用的目录中创建一个 urls.py 文档，并在其中添加以下行：
 ```python
 from django.urls import path
 from . import views
@@ -611,7 +611,7 @@ urlpatterns = [
 ]
 ```
 
-在上面的代码中，使用 app_name 变量定义应用进程命名空间。这允许您按应用进程组织 URL，并在引用它们时使用该名称。您可以使用 path（） 函数定义两种不同的。第一个 URL 不采用任何参数，并映射到post_list视图。 第二个采用以下四个参数，并映射到post_详细信息视图：
+在上面的代码中，使用 app_name 变量定义应用命名空间。这允许您按应用组织 URL，并在引用它们时使用该名称。您可以使用 path（） 函数定义两种不同的。第一个 URL 不采用任何参数，并映射到post_list视图。 第二个采用以下四个参数，并映射到post_详细信息视图：
 - year：需要一个整数
 - month：需要一个整数 
 - day：需要一个整数 
@@ -621,9 +621,9 @@ urlpatterns = [
 
 如果使用 path() 和转换器对您来说还不够，您可以使用 re_path() 来使用 Python 正则表达式定义复杂的 URL 。您可以在 https://docs 了解有关使用正则表达式定义 URL 的更多信息。 djangoproject.com/en/4.0/ref/urls/#django.urls.re_path。如果您以前没有使用过正则表达式，您可能需要查看位于 https://docs.python.org/3/howto/regex 的正则表达式 HOWTO。首先是html。
 
-> 为每个应用进程创建一个 urls.py 文档是使应用进程可由其他项目重用的最佳方式。
+> 为每个应用创建一个 urls.py 文档是使应用可由其他项目重用的最佳方式。
 
-接下来，您必须在项目的主 URL 中包含博客应用进程的 URL 。
+接下来，您必须在项目的主 URL 中包含博客应用的 URL 。
 
 编辑位于项目的 mysite 目录中的 urls.py 文档，使其如下所示：
 ```python
@@ -636,7 +636,7 @@ urlpatterns = [
 ]
 ```
 
-用 include 定义的新 URL 是指在博客应用进程中定义的 URL ，以便它们包含在 blog/path 下。您可以在命名空间博客下包含这些。命名空间在整个项目中必须是唯一的。稍后，您将使用命名空间，后跟冒号和 URL 名称（例如，blog：post_list 和 blog：post_detail）轻松引用您的博客 URL。有关 URL 命名空间的详细信息，请参阅 https:// docs.djangoproject.com/en/4.0/topics/http/urls/#url-namespaces。
+用 include 定义的新 URL 是指在博客应用中定义的 URL ，以便它们包含在 blog/path 下。您可以在命名空间博客下包含这些。命名空间在整个项目中必须是唯一的。稍后，您将使用命名空间，后跟冒号和 URL 名称（例如，blog：post_list 和 blog：post_detail）轻松引用您的博客 URL。有关 URL 命名空间的详细信息，请参阅 https:// docs.djangoproject.com/en/4.0/topics/http/urls/#url-namespaces。
 
 ### 6.3 模型中规范 URL
 规范 URL 是资源的首选 URL。您的站点中可能有不同的页面用于显示帖子，但只有一个 URL 可用作博客帖子的主 URL。 Django 中的约定是将 `get_absolute_url()` 方法添加到返回对象的规范 URL 的模型中。
@@ -654,7 +654,7 @@ def get_absolute_url(self):
 
 
 ## 7. 为您的视图创建模板
-您已经为博客应用进程创建了视图和 URLS。 URLs 将 URL 映射到视图，视图决定将哪些数据返回给用户。模板定义了数据的显示方式；它们通常是结合 Django 模板语言用 HTML 编写的。您可以在 https://docs.djangoproject.com/en/4.0/ref/templates/language/ 找到有关 Django 模板语言的更多信息。
+您已经为博客应用创建了视图和 URLS。 URLs 将 URL 映射到视图，视图决定将哪些数据返回给用户。模板定义了数据的显示方式；它们通常是结合 Django 模板语言用 HTML 编写的。您可以在 https://docs.djangoproject.com/en/4.0/ref/templates/language/ 找到有关 Django 模板语言的更多信息。
 
 让我们将模板添加到您的应用中，以便以用户友好的方式显示帖子。
 
@@ -705,7 +705,7 @@ Django 具有强大的模板语言，允许您指定数据的显示方式。它�
 </html>
 ```
 
-{% load static %} 告诉 Django 加载 django.contrib.staticfiles 应用进程提供的静态模板标签，该应用进程包含在 INSTALLED_APPS 设置中。加载它们后，您可以在此模板中使用 {% static %} 模板标记。使用此模板标记，您可以包含静态文档，例如 blog.css 文档，您可以在此示例的代码中找到博客应用进程的 static/ 目录下。将本章附带的代码中的 static/ 目录复制到与项目相同的位置，以将 CSS 样式应用于模板。您可以在 https://github.com/PacktPublishing/Django-3-by-Example/tree/master/Chapter01/mysite/blog/static 中找到该目录的内容。
+{% load static %} 告诉 Django 加载 django.contrib.staticfiles 应用提供的静态模板标签，该应用包含在 INSTALLED_APPS 设置中。加载它们后，您可以在此模板中使用 {% static %} 模板标记。使用此模板标记，您可以包含静态文档，例如 blog.css 文档，您可以在此示例的代码中找到博客应用的 static/ 目录下。将本章附带的代码中的 static/ 目录复制到与项目相同的位置，以将 CSS 样式应用于模板。您可以在 https://github.com/PacktPublishing/Django-3-by-Example/tree/master/Chapter01/mysite/blog/static 中找到该目录的内容。
 
 您可以看到有两个 {% block %} 标记。这些告诉Django你想在那个区域定义一个块。从此模板继承的模板可以使用内容填充块。您已经定义了一个名为 title 的块和一个称为 content 的块。
 
@@ -770,7 +770,7 @@ Django 具有强大的模板语言，允许您指定数据的显示方式。它�
 ## 8. 添加分页
 当您开始向博客添加内容时，您可能很容易达到数据库中存储数十或数百篇文章的程度。您可能希望将帖子列表拆分为多个页面，而不是在单个页面上显示所有帖子。 这可以通过分页来实现。您可以定义要在每页显示的帖子数，并检索与用户请求的页面相对应的帖子。Django有一个内置的分页类，允许您轻松管理分页数据。
 
-编辑博客应用进程的 views.py 文档以导入 Django 分页器类并修改post_list视图，如下所示：
+编辑博客应用的 views.py 文档以导入 Django 分页器类并修改post_list视图，如下所示：
 ```python
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 def post_list(request):
@@ -798,7 +798,7 @@ def post_list(request):
 4. 如果 page 参数不是整数，则检索结果的第一页。 如果此参数是大于结果的最后一页的数字，则检索最后一页。
 5. 将页码和检索到的对象传递到模板。
 
-现在，您必须创建一个模板来显示分页器，以便它可以包含在任何使用分页的模板中。在博客应用进程的模板/文档夹中，创建一个新文档并将其命名为pagination.html。将以下 HTML 代码添加到文档中：
+现在，您必须创建一个模板来显示分页器，以便它可以包含在任何使用分页的模板中。在博客应用的模板/文档夹中，创建一个新文档并将其命名为pagination.html。将以下 HTML 代码添加到文档中：
 ```html
 <div class="pagination">
     <span class="step-links">
@@ -836,7 +836,7 @@ paginator模板需要一个 Page 对象，以便呈现上一个和下一个链�
 
 您将post_list视图更改为基于类的视图，以使用 Django 提供的通用 ListView。此基本视图允许您列出任何类型的对象。
 
-编辑博客应用进程的 views.py 文档，并添加以下代码：
+编辑博客应用的 views.py 文档，并添加以下代码：
 ```python
 from django.views.generic import ListView
 
@@ -852,7 +852,7 @@ class PostListView(ListView):
 - 对结果进行分页，每页显示三个对象。
 - 使用自定义模板呈现页面。如果未设置默认模板，ListView 将使用 blog/post_list.html。
 
-现在打开博客应用进程的 urls.py 文档，注释前面的post_列表 URL ，并使用 PostListView 类添加新的 URL ，如下所示：
+现在打开博客应用的 urls.py 文档，注释前面的post_列表 URL ，并使用 PostListView 类添加新的 URL ，如下所示：
 ```python
 from django.urls import path
 from . import views
@@ -872,32 +872,32 @@ urlpatterns = [
 在浏览器中打开 [http://127.0.0.1:8000/blog/](http://127.0.0.1:8000/blog/)，并验证所有内容的工作方式是否与上一个post_list视图相同。这是一个基于类的视图的简单示例，它使用 Django 提供的泛型类。您将在第 10 章 “构建电子学习平台” 和后续章节中了解有关基于类的视图的更多信息。
 
 ## 10. 概要
-在本章中，您通过创建一个简单的博客应用进程学习了Django Web框架的基础知识。您设计了数据模型并将迁移应用于项目。您还为博客创建了视图、模板和 URL，包括对象分页。
+在本章中，您通过创建一个简单的博客应用学习了Django Web框架的基础知识。您设计了数据模型并将迁移应用于项目。您还为博客创建了视图、模板和 URL，包括对象分页。
 
-在下一章中，您将了解如何使用评论系统和标记功能增强博客应用进程，以及如何允许用户通过电子邮件共享帖子。
+在下一章中，您将了解如何使用评论系统和标记功能增强博客应用，以及如何允许用户通过电子邮件共享帖子。
 
 # 使用高级功能增强您的博客
-在上一章中，您创建了一个基本的博客应用进程。接下来，您将把应用进程变成一个功能齐全的博客，具有当今许多博客所具有的高级功能。您将在博客中实现以下功能：
+在上一章中，您创建了一个基本的博客应用。接下来，您将把应用变成一个功能齐全的博客，具有当今许多博客所具有的高级功能。您将在博客中实现以下功能：
 
 - 通过电子邮件分享帖子：当读者喜欢某篇文章时，他们可能希望与他人分享。您将实现通过电子邮件共享帖子的功能。
 - 向帖子添加评论：许多人希望允许其分享对象对帖子发表评论并创建讨论。您将让读者为您的博客文章添加评论。
 - 标记帖子：标记允许您使用简单的关键字以非分层方式对内容进行分类。您将实现一个标记系统，这是博客中非常受欢迎的功能。
 - 推荐类似的帖子：一旦您有了分类方法（例如标记系统），您就可以使用它为读者提供内容推荐。您将构建一个系统，推荐与某个博客文章共享标签的其他帖子。
 
-这些功能将使您的应用进程变成一个功能齐全的博客。
+这些功能将使您的应用变成一个功能齐全的博客。
 
 在本章中，我们将介绍以下主题：
 - 使用Django发送电子邮件
 - 创建forms并在视图中处理它们
 - 从模型创建表单
-- 集成第三方应用进程
+- 集成第三方应用
 - 构建复杂的查询集
 
 ## 1. 通过电子邮件分享您的 Posts
 首先，让我们允许用户通过电子邮件发送帖子来共享帖子。花点时间考虑如何使用视图、URL 和模板，使用您在上一章中学到的知识来创建此功能。为了允许用户通过电子邮件共享帖子，您需要执行以下操作：
 - 创建表单供用户填写其姓名、电子邮件、电子邮件收件人和可选注释
 - 在 views.py 文档中创建一个视图，用于处理已发布的数据并发送电子邮件
-- 在博客应用进程的 urls.py 文档中为新视图添加 URL 路由
+- 在博客应用的 urls.py 文档中为新视图添加 URL 路由
 - 创建一个模板以显示表单 使用Django创建表单
 
 ### 1.1 使用Django创建表单
@@ -907,7 +907,7 @@ Django附带了两个基类来构建表单：
 - `Form` : 允许您构建标准表单
 - `ModelForm`:允许您构建与模型实例绑定的表单
 
-首先，在博客应用进程的目录中创建一个 forms.py 文档，并使其如下所示：
+首先，在博客应用的目录中创建一个 forms.py 文档，并使其如下所示：
 ```python
 from django import forms
 
@@ -919,7 +919,7 @@ class EmailPostForm(forms.Form):
 ```
 
 这是你的第一个Django forms。看看代码。您已经通过继承基 Form 类创建了一个表单。您可以使用Django的不同字段类型来相应地验证字段
-> 表单可以驻留在 Django 项目中的任何位置。约定是将它们放在每个应用进程的 forms.py 文档中。
+> 表单可以驻留在 Django 项目中的任何位置。约定是将它们放在每个应用的 forms.py 文档中。
 
 
 name 字段为 CharField。这种类型的字段呈现为 `<input="text">` HTML 元素。每种字段类型都有一个默认`widget`，用于确定字段在 HTML 中的呈现方式。可以使用微件属性覆盖默认微件。在注释字段中，您可以使用Textarea构件将其显示为`<textarea>` HTML 元素，而不是默认的`<input>`元素。
@@ -927,7 +927,7 @@ name 字段为 CharField。这种类型的字段呈现为 `<input="text">` HTML 
 字段验证还取决于字段类型。例如，`email` 和 `to` 是电子邮件字段。这两个字段都需要有效的电子邮件地址;否则，字段验证将引发表单验证错误异常，表单将不会进行验证。表单验证还考虑了其他参数：为 name 字段定义的最大长度为 25 个字符;并使用 required=False 使注释字段可选。在进行现场验证时，还会考虑所有这些因素。此表单中使用的字段类型只是 Django 表单字段的一部分。有关所有可用表单域的列表，请访问 [Form fields](https://docs.djangoproject.com/en/4.0/ref/forms/fields/)
 
 ### 1.2 处理视图中的表单
-您需要创建一个新视图来处理表单，并在成功提交表单时发送电子邮件。编辑博客应用进程的 views.py 文档，并向其添加以下代码：
+您需要创建一个新视图来处理表单，并在成功提交表单时发送电子邮件。编辑博客应用的 views.py 文档，并向其添加以下代码：
 ```python
 from .forms import EmailPostForm
 
@@ -981,7 +981,7 @@ def post_share(request, post_id):
 ```python
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ```
-通过使用此设置，Django会将所有电子邮件输出到shell。这对于在没有 SMTP 服务器的情况下测试应用进程非常有用。
+通过使用此设置，Django会将所有电子邮件输出到shell。这对于在没有 SMTP 服务器的情况下测试应用非常有用。
 
 如果要发送电子邮件但没有本地 SMTP 服务器，则可以使用电子邮件服务提供商的 SMTP 服务器。以下示例配置适用于使用 Google 帐户通过 Gmail 服务器发送电子邮件：
 ```conf
@@ -1000,11 +1000,11 @@ EMAIL_USE_TLS = True
 
 send_mail（） 函数将主题、消息、发件人和收件人列表作为必需参数。通过将可选参数设置为 fail_silently=False，您可以告诉它在电子邮件无法正确发送时引发异常。如果您看到的输出为 1，则表示您的电子邮件已成功发送。
 
-如果您使用具有上述配置的Gmail发送电子邮件，则必须启用安全性较低的应用进程的访问权限。 https://myaccount.google.com/lesssecureapps，如下所示：
+如果您使用具有上述配置的Gmail发送电子邮件，则必须启用安全性较低的应用的访问权限。 https://myaccount.google.com/lesssecureapps，如下所示：
 
 ![google setting image]()
 
-在博客应用进程的 views.py 文档中编辑post_share视图，如下所示：
+在博客应用的 views.py 文档中编辑post_share视图，如下所示：
 ```python
 from django.core.mail import send_mail
 def post_share(request, post_id):
@@ -1036,7 +1036,7 @@ def post_share(request, post_id):
 
 由于您必须在电子邮件中包含指向帖子的链接，因此请使用其get_absolute_url（）方法检索帖子的绝对路径。您可以使用此路径作为request.build_absolute_uri（） 的输入来构建完整的 URL，包括 HTTP 架构和主机名。使用已验证表单的已清理数据构建电子邮件的主题和邮件正文，最后将电子邮件发送到表单的 to 字段中包含的电子邮件地址。
 
-现在您的视图已完成，请记住为其添加新的 URL 模式。打开博客应用进程的 urls.py 文档并添加post_share URL 模式，如下所示：
+现在您的视图已完成，请记住为其添加新的 URL 模式。打开博客应用的 urls.py 文档并添加post_share URL 模式，如下所示：
 
 ### 1.4 在模板中呈现表单
 创建form、对视图进行编程并添加 URL 路由后，您只是缺少此视图的模板。在`blog/templates/blog/post/`目录中创建一个新文档，并将其命名为`share.html`。向其添加以下代码：
@@ -1120,7 +1120,7 @@ def post_share(request, post_id):
 4. 编辑帖子详细信息模板以显示评论列表和表单以添加新评论
 
 ### 2.1 构建 models
-首先，让我们构建一个模型来存储comment。打开博客应用进程的 models.py 文档，并添加以下代码：
+首先，让我们构建一个模型来存储comment。打开博客应用的 models.py 文档，并添加以下代码：
 ```python
 class Comment(models.Model):
     '''Comment system models'''
@@ -1152,7 +1152,7 @@ class Comment(models.Model):
 python manage.py makemigrations blog
 ```
 
-Django在博客应用进程的迁移/目录中生成了一个0002_comment.py文档。现在，您需要创建相关的数据库架构并将更改应用于数据库。运行以下命令以应用现有迁移：
+Django在博客应用的迁移/目录中生成了一个0002_comment.py文档。现在，您需要创建相关的数据库架构并将更改应用于数据库。运行以下命令以应用现有迁移：
 ```shell
 python manage.py migrate
 
@@ -1164,7 +1164,7 @@ Running migrations:
 
 您刚刚创建的迁移已应用;现在数据库中存在一个blog_comment表。
 
-接下来，您可以将新模型添加到管理站点，以便通过简单的界面管理 `comment`。打开博客应用进程的 `admin.py` 文档，导入注释模型，然后添加以下 `ModelAdmin` 类：
+接下来，您可以将新模型添加到管理站点，以便通过简单的界面管理 `comment`。打开博客应用的 `admin.py` 文档，导入注释模型，然后添加以下 `ModelAdmin` 类：
 ```python
 from .models import Comment
 @admin.register(Comment)
@@ -1180,7 +1180,7 @@ class CommentAdmin(admin.ModelAdmin):
 该模型现已在管理站点中注册，您可以使用简单的界面管理 Comment 实例。
 
 ### 2.2 从模型创建表单
-您仍然需要构建一个表单，以便让用户对博客文章发表评论。请记住，Django 有两个基类来构建表单：`Form` 和 `ModelForm`。您之前使用过第一个，让您的用户通过电子邮件共享帖子。在本例中，您将需要使用 `ModelForm`，因为您必须从`Comment`模型动态生成表单。编辑博客应用进程的 forms.py 文档，并添加以下行：
+您仍然需要构建一个表单，以便让用户对博客文章发表评论。请记住，Django 有两个基类来构建表单：`Form` 和 `ModelForm`。您之前使用过第一个，让您的用户通过电子邮件共享帖子。在本例中，您将需要使用 `ModelForm`，因为您必须从`Comment`模型动态生成表单。编辑博客应用的 forms.py 文档，并添加以下行：
 ```python
 class CommentForm(forms.ModelForm):
     '''Comment Forms'''
@@ -1271,7 +1271,7 @@ new_comment.save()
 
 > `{% with %}` 模板标记可用于避免命中数据库或多次访问昂贵的方法。
 
-使用pluralize 模板筛选器可以显示单词comments 的复数后缀，具体取决于`total_comments`值。模板筛选器采用它们所应用的变量的值作为其输入，并返回计算值。我们将在第 3 章 “扩展您的博客应用进程”中讨论模板筛选器。
+使用pluralize 模板筛选器可以显示单词comments 的复数后缀，具体取决于`total_comments`值。模板筛选器采用它们所应用的变量的值作为其输入，并返回计算值。我们将在第 3 章 “扩展您的博客应用”中讨论模板筛选器。
 
 如果值与 1 不同，则复数模板筛选器将返回一个带有字母“s”的字符串。前面的文本将呈现为 0 个注释、1 个注释或 N 个注释。Django包含大量的模板标签和过滤器，可以帮助您以所需的方式显示信息。
 
@@ -1318,7 +1318,7 @@ new_comment.save()
 如果您返回到帖子详细信息视图，您将注意到不再显示非活动评论;它也不计入评论总数。借助活动字段，您可以停用不适当的评论，并避免在帖子中显示它们。
 
 ## 添加标签功能
-实施评论系统后，您需要创建一种标记帖子的方法。您将通过将第三方Django标记应用进程集成到您的项目中来做到这一点。django-taggit是一个可重用的应用进程，主要为您提供Tag模型和管理器，以轻松地向任何模型添加标签。您可以在 https://github.com/jazzband/django-taggit 查看其源代码。
+实施评论系统后，您需要创建一种标记帖子的方法。您将通过将第三方Django标记应用集成到您的项目中来做到这一点。django-taggit是一个可重用的应用，主要为您提供Tag模型和管理器，以轻松地向任何模型添加标签。您可以在 https://github.com/jazzband/django-taggit 查看其源代码。
 
 首先，您需要通过运行以下命令通过 pip 安装 django-taggit：
 ```shell
@@ -1333,7 +1333,7 @@ INSTALLED_APPS = [
 ]
 ```
 
-打开博客应用进程的 models.py 文档，并使用以下代码将 django-taggit 提供的 TaggableManager 管理器添加到 Post 模型中：
+打开博客应用的 models.py 文档，并使用以下代码将 django-taggit 提供的 TaggableManager 管理器添加到 Post 模型中：
 ```python
 from taggit.managers import TaggableManager
 class Post(models.Model):
@@ -1390,7 +1390,7 @@ Running migrations:
 
 这很容易，对吧？运行 python manage.py runserver 命令以再次启动开发服务器，并在浏览器中打开 http://127.0.0.1:8000/admin/taggit/tag/
 
-您将看到管理页面，其中包含 taggit 应用进程的 Tag 对象列表：
+您将看到管理页面，其中包含 taggit 应用的 Tag 对象列表：
 
 ![Tags admin Images]()
 
@@ -1405,7 +1405,7 @@ Running migrations:
 
 ![detail post for tags display image]()
 
-接下来，您将编辑post_list视图，以允许用户列出使用特定标记标记的所有帖子。打开博客应用进程的 views.py 文档，导入 django-taggit 中的 Tag 模型，然后更改post_list视图以选择性地按标记筛选帖子，如下所示：
+接下来，您将编辑post_list视图，以允许用户列出使用特定标记标记的所有帖子。打开博客应用的 views.py 文档，导入 django-taggit 中的 Tag 模型，然后更改post_list视图以选择性地按标记筛选帖子，如下所示：
 ```python
 from taggit.models import Tag
 
@@ -1437,7 +1437,7 @@ post_list视图现在的工作方式如下：
 
 1. 它采用具有 `None` 默认值的可选 `tag_slug` 参数。 此参数将在 URL 中传递。
 2. 在视图中，生成初始 QuerySet，检索所有已发布的帖子，如果存在给定的标记辅助信息区，则使用 get_object_or_404（） 快捷方式获取具有给定辅助信息组的 Tag 对象。
-3. 然后，按包含给定标记的帖子列表筛选帖子列表。 由于这是一种多对多关系，因此您必须按给定列表中包含的标签过滤帖子，在您的情况下，该列表仅包含一个元素。您可以使用__in字段查找。当一个模型的多个对象与另一个模型的多个对象相关联时，就会发生多对多关系。在您的应用进程中，一个帖子可以有多个标签，一个标签可以与多个帖子相关。您将在第 5 章 “在您的网站上共享内容”中学习如何创建多对多关系。您可以在 https://docs.djangoproject.com/en/4.0/topics/db/examples/many_to_many/ 发现更多关于多对多关系的信息。
+3. 然后，按包含给定标记的帖子列表筛选帖子列表。 由于这是一种多对多关系，因此您必须按给定列表中包含的标签过滤帖子，在您的情况下，该列表仅包含一个元素。您可以使用__in字段查找。当一个模型的多个对象与另一个模型的多个对象相关联时，就会发生多对多关系。在您的应用中，一个帖子可以有多个标签，一个标签可以与多个帖子相关。您将在第 5 章 “在您的网站上共享内容”中学习如何创建多对多关系。您可以在 https://docs.djangoproject.com/en/4.0/topics/db/examples/many_to_many/ 发现更多关于多对多关系的信息。
 
 请记住，查询集是懒惰的。只有在呈现模板时循环访问帖子列表时，才会计算用于检索帖子的 QuerySet。
 
@@ -1445,7 +1445,7 @@ post_list视图现在的工作方式如下：
 ```python
 return render(request, 'blog/post/list.html', {'posts' : posts, 'page':page, 'tag':tag})
 ```
-打开博客应用进程的 urls.py 文档，注释掉基于类的 PostListView URL 模式，然后取消注释post_list视图，如下所示：
+打开博客应用的 urls.py 文档，注释掉基于类的 PostListView URL 模式，然后取消注释post_list视图，如下所示：
 ```python
 urlpatterns = [
     # post urls
@@ -1508,7 +1508,7 @@ urlpatterns = [
 5. 如果两个或多个帖子的标签数量相同，请推荐最新的帖子
 6. 将查询限制为要推荐的帖子数
 
-这些步骤将转换为复杂的查询集，您将其包含在post_detail视图中。将博客应用进程的 views.py 文档换行，并在其顶部添加以下导入：
+这些步骤将转换为复杂的查询集，您将其包含在post_detail视图中。将博客应用的 views.py 文档换行，并在其顶部添加以下导入：
 ```python
 from django.db.models import Count
 ```
@@ -1558,21 +1558,21 @@ similar_posts = similar_posts.annotate(same_tags =  Count('tags')).order_by('-sa
 您还可以将标签列表添加到帖子详细信息模板，方法与在 blog/post/list.html 模板中相同。
 
 ## 摘要
-在本章中，您学习了如何使用 Django 表单和模型表单。 您创建了一个系统来通过电子邮件共享您网站的内容，并为您的博客创建了一个评论系统。您在博客文章中添加了标记，集成了可重用的应用进程，并构建了复杂的 QuerySet 以按相似性检索对象。
+在本章中，您学习了如何使用 Django 表单和模型表单。 您创建了一个系统来通过电子邮件共享您网站的内容，并为您的博客创建了一个评论系统。您在博客文章中添加了标记，集成了可重用的应用，并构建了复杂的 QuerySet 以按相似性检索对象。
 
 在下一章中，您将学习如何创建自定义模板标签和过滤器。 您还将为博客文章构建自定义站点地图和源，并为您的帖子实现全文搜索功能。
 
-# 扩展您的博客应用进程
-上一章介绍了表单的基础知识和评论系统的创建。您还学习了如何使用Django发送电子邮件，并通过将第三方应用进程与您的项目集成来实现标记系统。在本章中，您将使用博客平台上使用的其他一些流行功能扩展您的博客应用进程。您还将了解Django的其他组件和功能。
+# 扩展您的博客应用
+上一章介绍了表单的基础知识和评论系统的创建。您还学习了如何使用Django发送电子邮件，并通过将第三方应用与您的项目集成来实现标记系统。在本章中，您将使用博客平台上使用的其他一些流行功能扩展您的博客应用。您还将了解Django的其他组件和功能。
 
 本章将涵盖以下几点：
 
 - 创建自定义模板标签和过滤器：您将学习如何构建自己的模板标签和模板过滤器，以利用Django模板的功能。
 - 添加站点地图和帖子源：您将学习如何使用Django附带的站点地图框架和联合框架。
-- 使用PostgreSQL实现全文搜索：搜索是博客中非常受欢迎的功能。您将学习如何为您的博客应用进程实现高级搜索引擎。
+- 使用PostgreSQL实现全文搜索：搜索是博客中非常受欢迎的功能。您将学习如何为您的博客应用实现高级搜索引擎。
 
 ## 1. 创建自定义模板标签和过滤器
-Django提供了各种内置的模板标签，例如{%if %}或{%block %}。 您在第 1 章 “构建博客应用进程”和第 2 章 “使用高级功能增强博客”中使用了不同的模板标记。您可以在 [https://docs.djangoproject.com/en/4.0/ref/templates/builtins/](https://docs.djangoproject.com/en/4.0/ref/templates/builtins/) 上找到内置模板标签和过滤器的完整参考。
+Django提供了各种内置的模板标签，例如{%if %}或{%block %}。 您在第 1 章 “构建博客应用”和第 2 章 “使用高级功能增强博客”中使用了不同的模板标记。您可以在 [https://docs.djangoproject.com/en/4.0/ref/templates/builtins/](https://docs.djangoproject.com/en/4.0/ref/templates/builtins/) 上找到内置模板标签和过滤器的完整参考。
 
 Django还允许您创建自己的模板标签来执行自定义操作。 当您需要向模板添加 Django 模板标签核心集未涵盖的功能时，自定义模板标签会非常方便。这可以是用于执行查询集的标记，也可以是要跨模板重用的任何服务器端处理的标记。例如，您可以构建一个模板标记来显示博客上发布的最新帖子的列表。您可以在多个页面的博客边栏中包含此列表，而不管视图如何。
 
@@ -1581,9 +1581,9 @@ Django提供了以下帮助进程函数，允许您以简单的方式创建自�
 - simple_tag : 处理数据并返回字符串
 - inclusion_tag : 处理数据并返回呈现的模板
 
-模板标签必须位于 Django 应用进程中。
+模板标签必须位于 Django 应用中。
 
-在博客应用进程目录中，创建一个新目录，将其命名为`templatetags`，然后向其添加一个空__init__.py文档。在同一文档夹中创建另一个文档，并将其命名为blog_tags.py。博客应用进程的文档结构应如下所示：
+在博客应用目录中，创建一个新目录，将其命名为`templatetags`，然后向其添加一个空__init__.py文档。在同一文档夹中创建另一个文档，并将其命名为blog_tags.py。博客应用的文档结构应如下所示：
 + blog/
     + templatetags/
         - `__init__.py`
@@ -1773,6 +1773,100 @@ truncatewords_html筛选器在一定数量的单词后截断字符串，避免�
 
 
 ## 向网站添加站点地图
+Django附带了一个站点地图框架，它允许您为您的网站动态生成站点地图。站点地图是一个 XML 文档，用于告知搜索引擎您网站的网页、其相关性以及更新频率。使用站点地图将使您的网站在搜索引擎排名中更加明显：站点地图可帮助抓取工具将您网站的内容编入索引。
+
+Django 站点地图框架依赖于 django.contrib.sites，它允许您将对象关联到与您的项目一起运行的特定网站。当您想使用单个 Django 项目运行多个站点时，这会派上用场。要安装站点地图框架，您需要激活项目中的站点和站点地图应用进程。
+
+编辑项目的 settings.py 文档并将 `django.contrib.sites` 和 `django.contrib.sitemaps` 添加到 `INSTALLED_APPS` 设置。此外，为站点 ID 定义一个新设置，如下所示：
+```python
+SITE_ID = 1
+
+INSTALLED_APPS = [
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
+]
+```
+现在运行以下命令以在数据库中创建 Django 站点应用进程的表：
+```shell
+python manage.py migrate
+```
+站点应用进程现在已与数据库同步
+
+接下来，在博客应用进程目录中创建一个新文档，并将其命名为`sitemaps.py`.打开该文档并向其添加以下代码：
+```python
+from django.contrib.sitemaps import Sitemap
+from .models import Post
+
+class PostSitemap(Sitemap):
+    '''继承Django Sitemap类 创建PostSitemap'''
+    changefreq = 'weekly'
+    priority = 0.9
+
+    def items(self):
+        return Post.published.all()
+
+    def lastmod(self, obj):
+        return obj.updated
+```
+
+您可以通过继承`sitemap`模块的站点地图类来创建自定义站点地图。`changefreq` 和`priority`属性表示帖子页面的更改频率及其在网站中的相关性（最大值为 1）。
+
+`items()` 方法返回要包含在此站点地图中的对象的 QuerySet。默认情况下，Django 在每个对象上调用 `get_absolute_url()` 方法来检索其 URL。请记住，您在第 1 章“构建博客应用进程”中创建了此方法，用于检索帖子的规范 URL。如果要为每个对象指定 URL，可以向站点地图类添加位置方法。
+
+lastmod 方法接收 items() 返回的每个对象，并返回对象最后一次修改的时间。
+
+变更频率属性和优先级属性都可以是方法或属性。 您可以在位于 https://docs.djangoproject.com/en/4.0/ref/contrib/sitemaps/ 的官方 Django 文档中查看完整的站点地图参考。
+
+最后，您只需要添加您的站点地图 URL。编辑项目的主 urls.py 文档并添加站点地图，如下所示：
+```python
+from django.contrib import admin
+from django.urls import include, path
+from django.contrib.sitemaps.views import sitemap
+from blog.sitemaps import PostSitemap
+
+sitemaps = {
+    'posts' : PostSitemap
+}
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('blog/', include('blog.urls', namespace='blog')),
+    path('sitemap.xml', sitemap, {'sitemaps' : sitemaps}, name='django.contrib.sitemaps.views.sitemap')
+]
+```
+在上面的代码中，您将包括所需的导入并定义`sitemaps`的字典。您可以定义与站点地图匹配的`sitemap.xml`并使用`sitemap`视图。`sitemaps`字典将传递到`sitemap`视图
+
+现在运行开发服务器并打开 [http://127.0.0.1:8000/sitemap](http://127.0.0.1:8000/sitemap)。 浏览器中的 xml。您将看到以下 XML 输出：
+```xml
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>http://example.com/blog/2022/8/20/fieldoptions/</loc>
+        <lastmod>2022-09-01</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>http://example.com/blog/2022/8/20/choices/</loc>
+        <lastmod>2022-08-26</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+</urlset>
+```
+
+每个帖子的URL都是调用其`get_absolute_url（）`方法构建的。
+
+`lastmod` 属性对应于您在`sitemaps`中指定的`Post.updated`字段，而 `changefreq` 和`priority`属性也取自 `PostSitemap` 类。
+
+您可以看到，用于构建 URL 的域 example.com。此域来自存储在数据库中的 Site 对象。此默认对象是在将站点的框架与数据库同步时创建的。
+
+在浏览器中打开 http://127.0.0.1:8000/admin/sites/site/。您应该看到如下内容：
+![Site settings to Django AdminPanel]()
+
+前面的屏幕截图包含网站框架的列表显示管理视图。在这里，您可以设置要由站点框架和依赖于它的应用进程使用的域或主机。要生成本地环境中存在的 URL，请将域名更改为 localhost：8000（如以下屏幕截图所示），然后保存：
+![Site Settings detaill]()
+
+现在，Feed 中显示的 URL 将使用此主机名构建。在生产环境中，您必须为站点的框架使用自己的域名。
 
 ## 创建Blog Post 订阅**RRS**
 
