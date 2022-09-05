@@ -1772,7 +1772,7 @@ truncatewords_html筛选器在一定数量的单词后截断字符串，避免�
 正如您在前面的屏幕截图中所见，自定义模板过滤器对于自定义格式非常有用。您可以在 https://docs.djangoproject.com/en/4.0/howto/custom-template-tags/#writing-custom-template-filters 找到有关自定义过滤器的更多信息。
 
 
-## 向网站添加站点地图
+## 2. 向网站添加站点地图
 Django附带了一个站点地图框架，它允许您为您的网站动态生成站点地图。站点地图是一个 XML 文档，用于告知搜索引擎您网站的网页、其相关性以及更新频率。使用站点地图将使您的网站在搜索引擎排名中更加明显：站点地图可帮助抓取工具将您网站的内容编入索引。
 
 Django 站点地图框架依赖于 django.contrib.sites，它允许您将对象关联到与您的项目一起运行的特定网站。当您想使用单个 Django 项目运行多个站点时，这会派上用场。要安装站点地图框架，您需要激活项目中的站点和站点地图应用进程。
@@ -1868,7 +1868,7 @@ urlpatterns = [
 
 现在，Feed 中显示的 URL 将使用此主机名构建。在生产环境中，您必须为站点的框架使用自己的域名。
 
-## 创建Blog Post 订阅**RRS**
+## 3. 创建Blog Post 订阅**RRS**
 Django 有一个内置的`feed聚合`框架，您可以使用它以类似于使用站点框架创建站点地图的方式动态生成 `RSS` 或 `Atom feed`。 Web feed是一种数据格式（通常是 XML），它为用户提供最近更新的内容。用户将能够使用`feed 聚合器`（用于读取提要和获取新内容通知的软件）订阅您的提要。
 
 在您的博客应用目录中创建一个新文档并将其命名为 `feeds.py`。向其中添加以下行：
@@ -1929,7 +1929,97 @@ urlpatterns = [
 
 您可以在 [https://docs.djangoproject.com/en/4.0/ref/contrib/syndication/](https://docs.djangoproject.com/en/4.0/ref/contrib/syndication/) 阅读有关 Django 联合提要框架的更多信息。
 
-## 向博客添加全文搜索
+## 4.0 向博客添加全文搜索
+接下来，您将为您的博客添加搜索功能。使用用户输入在数据库中搜索数据是 Web 应用进程的常见任务。 Django ORM 允许您使用例如 contains 过滤器（或其不区分大小写的版本，icontains）执行简单的匹配操作。您可以使用以下查询来查找正文中包含单词 framework 的帖子：
+```python
+from blog.models import Post
+Post.objects.filter(body__contains='framework')
+```
 
+但是，如果要执行复杂的搜索查找、按相似性检索结果，或者根据术语在文本中出现的频率或不同字段的重要性（例如，标题中显示的术语与正文中出现的相关性）对术语进行加权，则需要使用全文搜索引擎。当您考虑大型文本块时，仅使用对字符串的操作构建查询是不够的。全文搜索在尝试匹配搜索条件时，会根据存储的内容检查实际单词。
+
+Django 提供了创建在 PostgreSQL 全文搜索功能之上的强大搜索功能。 `django.contrib.postgres` 模块提供 `PostgreSQL` 提供的功能，这些功能不被 Django 支持的其他数据库共享。您可以在 [https://www.postgresql.org/docs/12/static/textsearch.html](https://www.postgresql.org/docs/12/static/textsearch.html) 了解 `PostgreSQL` 全文搜索。
+
+
+虽然Django是一个与数据库无关的Web框架，但它提供了一个模块，该模块支持PostgreSQL提供的丰富功能集的一部分，而Django支持的其他数据库则没有提供该模块。
+
+### 4.1 安装 PostgreSQL
+您目前正在将 SQLite 用于您的博客项目。这对于开发目的来说已经足够了。但是，对于生产环境，您将需要更强大的数据库，例如 `PostgreSQL`、`MariaDB`、`MySQL` 或 `Oracle`。您将数据库更改为 `PostgreSQL`，以从其全文搜索功能中受益。
+
+如果您使用的是 Linux，请使用以下命令安装 PostgreSQL：
+```shell
+
+```
+如果您使用的是 macOS 或 Windows，请从 [https://www.postgresql.org/download/](https://www.postgresql.org/download/ ) 下载 PostgreSQL 并安装它。
+
+可以选择配置 docker Postgresql Image
+```conf
+version: '1'
+
+services:
+  db:
+    image: library/postgres:13-alpine
+    environment:
+      - POSTGRES_DB=blog
+      - POSTGRES_USER=blog
+      - POSTGRES_PASSWORD=blog
+    ports:
+      - 5432:5432
+    volumes:
+      - ./bin/datas/prostgresql/:/var/lib/postgresql/data
+```
+
+您还需要安装`psycopg2` PostgreSQL适配器用于Python。在 shell 中运行以下命令进行安装：
+```shell
+pip install psycopg2-binary==2.8.4
+```
+
+系统将提示您输入新用户的密码。输入所需的密码，然后创建博客数据库并将所有权授予您刚刚使用以下命令创建的博客用户：
+```shell
+su postgres
+createuser -dP blog
+```
+
+然后，编辑项目的 settings.py 文档并修改 DATABASES 设置，使其如下所示：
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'blog',
+        'USER': 'blog',
+        'PASSWORD': 'blog',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
+}
+```
+
+将上述数据替换为您创建的用户的数据库名称和凭据。新数据库为空。运行以下命令以应用所有数据库迁移：
+```shell
+python manage.py migrate
+```
+
+最后，使用以下命令创建一个超级用户：
+```shell
+python manage.py createsuperuser
+```
+
+现在，您可以使用新的超级用户运行开发服务器并访问 http://127.0.0.1:8000/admin/ 管理站点。
+
+由于您切换了数据库，因此其中没有存储任何帖子。使用几个示例博客文章填充您的新数据库，以便您可以对数据库执行搜索。
+
+### 4.2 简单的搜索查找
+
+### 4.3 搜索多个字段
+
+### 4.4 构建搜索视图
+
+### 4.5 词干提取和排名结果
+
+### 4.6 加权查询
+
+### 4.7 使用三元相似度搜索
+
+### 4.8 其他全文搜索引擎
 
 ## 摘要
