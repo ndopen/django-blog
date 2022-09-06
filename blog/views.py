@@ -1,9 +1,10 @@
 from django.shortcuts import get_object_or_404, render
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
-from .forms import EmailPostForm, CommentForm
+from .forms import EmailPostForm, CommentForm, SerachForm
 from django.core.mail import send_mail
 from django.db.models import Count
+from django.contrib.postgres.search import SearchVector
 
 
 from .models import Post, Comment
@@ -89,3 +90,22 @@ def post_share(request, post_id):
         form = EmailPostForm()
 
     return render(request, 'blog/post/share.html', {'post':post, 'form':form, 'sent':sent})
+
+
+def post_search(request):
+    '''搜索表单视图处理'''
+    form = SerachForm()
+    query = None
+    results = []
+
+    if 'query' in request.GET:
+        form = SerachForm(request.GET)
+
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            results = Post.published.annotate(search = SearchVector('title', 'body')).filter(search=query)
+
+
+
+    return render(request, 'blog/post/search.html', {'form':form, 'query':query, 'results':results})
+

@@ -2009,10 +2009,116 @@ python manage.py createsuperuser
 由于您切换了数据库，因此其中没有存储任何帖子。使用几个示例博客文章填充您的新数据库，以便您可以对数据库执行搜索。
 
 ### 4.2 简单的搜索查找
+编辑项目的 settings.py 文档，并将 `django.contrib.postgres` 添加到INSTALLED_APPS设置中，如下所示：
+```python
+INSTALLED_APPS = [
+    ...
+    'django.contrib.postgres'
+]
+```
+
+现在您可以使用搜索 QuerySet 查找来搜索单个字段，如下所示：
+```python
+from blog.models import Post
+Post.objects.filter(body__search='django')
+```
+此查询使用 PostgreSQL 为 body 字段创建搜索vector，并从术语 django 创建搜索查询。通过将查询与vector进行匹配来获得结果。
 
 ### 4.3 搜索多个字段
+您可能想要搜索多个字段。在这种情况下，您需要定义一个 `SearchVector` 对象。让我们构建一个vector，允许您搜索 Post 模型的 title 和 body 字段：
+```python
+from django.contrib.postgres.search import SearchVector
+from blog.models import Post
+
+>>> Post.objects.annotate(search=SearchVector('title','body')).filter(search='4.0')
+<QuerySet [<Post: Django 4.1 released>, <Post: 已發布 Django 安全版本：4.0.7 和 3.2.15>]>
+```
+
+使用`annotate`和定义具有这两个字段的 `SearchVector`，您可以提供一种功能，用于将查询与帖子的标题和正文进行匹配。
+
+> 全文搜索是一个密集的过程。如果要搜索的行数超过几百行，则应定义与正在使用的搜索矢量匹配的功能索引。Django 为您的模型提供了一个 `SearchVectorField` 字段。您可以在 https://docs.djangoproject.com/en/4.0/ref/contrib/postgres/search/#performance 上阅读更多相关信息。
 
 ### 4.4 构建搜索视图
+现在，您将创建自定义视图以允许用户搜索帖子。首先，您需要一个搜索表单。编辑博客应用进程的 `forms.py` 文档，并添加以下表单：
+```python
+class SerachForm(forms.Form):
+    '''搜索表单'''
+    query = forms.CharField()
+```
+
+您将使用查询字段让用户引入搜索词。编辑博客应用进程的 views.py 文档，并向其添加以下代码：
+```python
+from .forms import SerachForm
+from django.contrib.postgres.search import SearchVector
+
+def post_search(request):
+    '''搜索表单视图处理'''
+    form = SerachForm()
+    query = None
+    results = []
+
+    if 'query' in request.GET:
+        form = SerachForm(request.GET)
+
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            results = Post.published.annotate(search = SearchVector('title', 'boody')).filter(search=query)
+
+    return render(request, 'blog/post/serach.html', {'form':form, 'query':query, 'results':results})
+```
+在前面的视图中，首先实例化 `SearchForm` 窗体。若要检查表单是否已提交，请在请求中查找查询参数。获取字典。使用 `GET` 方法而不是 `POST` 发送表单，以便生成的 URL 包含查询参数并且易于共享。提交表单后，您可以使用提交的 GET 数据对其进行实例化，并验证表单数据是否有效。如果表单有效，则使用使用标题和正文本段构建的自定义 `SearchVector` 实例搜索已发布的帖子。
+
+搜索视图现已准备就绪。您需要创建一个模板，以便在用户执行搜索时显示表单和结果。在 `blog/post/templates` 目录中创建一个新文档，将其命名为 `search.html`，然后向其添加以下代码：
+```python
+{% extends 'blog/base.html' %}
+{% load blog_tags %}
+
+{% block title %}Search{% endblock  %}
+
+{% block content %}
+    {% if query %}
+        <h1>Posts containing {{ query }}</h1>
+
+        <h3>
+            {% with results.count as total_results %}
+                Found {{toral_results}} results {{total_results | pluralize}}
+            {% endwith %}
+        </h3>
+
+        {% for posts in results %}
+            <h4>
+                <a href=" posts.get_absolute_url">{{ posts.title}}</a>
+            </h4>
+
+            {{post.body|markdown|truncatewords_html:5}}
+
+        {% empty %}
+            <p>There are no results for your query.</p>
+        {% endfor %}
+
+    {% else %}
+        <h1>Search for posts</h1>
+        <form method="get">
+            {{form.as_p}}
+            <input type="submit" value="Search">
+        </form>
+    {% endif %}
+{% endblock %}
+```
+
+与在搜索视图中一样，您可以区分表单是否已通过查询参数的存在提交。在提交查询之前，将显示表单和提交按钮。提交帖子后，将显示执行的查询、结果总数以及返回的帖子列表。
+
+最后，编辑博客应用进程的 urls.py 文档，并添加以下 URL 模式：
+```python
+
+```
+接下来，在浏览器中打开 **http://127.0.0.1:8000/blog/search/**。您应该会看到以下搜索表单：
+![search page image][]
+
+输入查询，然后单击“搜索”按钮。您将看到搜索查询的结果，如下所示：
+![search results pages images]()
+
+祝贺！您已经为博客创建了一个基本的搜索引擎。
 
 ### 4.5 词干提取和排名结果
 
