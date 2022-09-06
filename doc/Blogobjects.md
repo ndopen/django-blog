@@ -2121,11 +2121,58 @@ def post_search(request):
 祝贺！您已经为博客创建了一个基本的搜索引擎。
 
 ### 4.5 词干提取和排名结果
+词干分解是将单词简化为词干、词根或词根形式的过程。 搜索引擎使用词干提取将索引词减少到其词干，并能够匹配词形变化或派生词。例如，“音乐”和“音乐家”可以被搜索引擎视为相似的单词。
+
+Django 提供了一个 `SearchQuery` 类，用于将术语转换为搜索查询对象。 默认情况下，术语通过词干算法传递，这有助于您获得更好的匹配。您还希望按相关性对结果进行排序。PostgreSQL提供了一个`SearchRank`，该函数根据查询词出现的频率以及它们之间的距离对结果进行排序。
+
+编辑博客应用的 `views.py `文档，并添加以下导入：
+```python
+
+
+```
+在上面的代码中，您将创建一个 SearchQuery 对象，按该对象筛选结果，然后使用 SearchRank 按相关性对结果进行排序。
+
+您可以在浏览器中打开 http://127.0.0.1:8000/blog/search/ 并测试不同的搜索以测试词干提取和排名。
 
 ### 4.6 加权查询
+您可以提升特定矢量，以便在按相关性对结果进行排序时，将更多的权重归因于它们。例如，您可以使用它来为按标题而不是按内容匹配的帖子提供更多相关性。
+
+编辑博客应用进程的 views.py 文档的前几行，并使它们看起来像这样：
+```python
+
+```
+
+在上面的代码中，您将不同的权重应用于使用标题和正文本段构建的搜索矢量。默认权重为 D、C、B 和 A，它们分别引用数字 0.1、0.2、0.4 和 1.0。对标题搜索矢量的权重为 1.0，对正文矢量的权重为 0.4。标题匹配将优先于正文内容匹配。筛选结果以仅显示排名高于 0.3 的结果。
+
 
 ### 4.7 使用三元相似度搜索
+另一种搜索方法是三元组相似性。三元组是一组由三个连续字符组成的组。您可以通过计算两个字符串共享的三元组数来测量它们的相似性。事实证明，这种方法对于测量许多语言中单词的相似性非常有效。
+
+为了在**PostgreSQL**中使用**trigrams**，您需要先安装`pg_trgm`扩展。从 **shell** 执行以下命令以连接到数据库：
+```shell
+psql blog
+```
+
+然后，执行以下命令以安装**pg_trgm**扩展：
+```shell
+CREATE EXTENSION pg_trgm;
+```
+
+让我们编辑您的视图并对其进行修改以搜索三元组。编辑博客应用进程的 **views.py** 文档，并添加以下导入：
+```python
+from django.contrib.postgres.search import TrigramSimilarity
+```
+
+然后，将`search query`查询替换为以下行：
+```python
+results = Post.published.annotate(similarity=TrigramSimilarity('title', query),).filter(similarity__gt=0.1).order_by('-similarity')
+```
+现在，您的项目中内置了一个强大的搜索引擎。有关全文搜索的更多信息，请访问 https://docs.djangoproject.com/en/3.0/ref/contrib/postgres/search/
 
 ### 4.8 其他全文搜索引擎
+您可能希望使用**PostgreSQL**以外的全文搜索引擎。如果你想使用**Solr**或**Elasticsearch**，你可以使用**Haystack**将它们集成到你的**Django**项目中。**Haystack**是一个Django应用进程，可用作多个搜索引擎的抽象层。它提供了一个简单的搜索**API**，与**Django QuerySets**非常相似。您可以在 https://django-haystack.readthedocs.io/en/master/ 找到有关**Haystack**的更多信息。
 
 ## 摘要
+在本章中，您学习了如何创建自定义 Django 模板标签和过滤器，以便为模板提供自定义功能。您还为搜索引擎创建了一个站点地图来抓取您的网站，并创建了一个 RSS 源供用户订阅您的博客。然后，您使用PostgreSQL的全文搜索引擎为您的博客构建了一个搜索引擎。
+
+在下一章中，您将学习如何使用Django身份验证框架构建社交网站，创建自定义用户配置文档以及构建社交身份验证。
